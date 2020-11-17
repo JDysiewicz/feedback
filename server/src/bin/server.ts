@@ -12,19 +12,20 @@ const io = socketio(server, {cors: {origin: "http://localhost:3000", methods:["G
 
 io.on("connection", (socket: Socket) => {
     console.log("USER JOINED!")
+    socket.join("main-room");
     // Send all the curent messages to the new connection
-    socket.emit("message", messageList);
+    socket.to("main-room").emit("message", messageList);
 
     socket.on("upvote", ({message, value}) => {
         const idx: number = messageList.findIndex(msg => msg.message === message.message);
         messageList[idx] = {...message, upvotes: message.upvotes+value};
-        io.emit("message", messageList);
+        io.to("main-room").emit("message", messageList);
     });
 
     // Update messageList with newMessage and send the update to everyone
     socket.on("message", newMessage => {
         messageList.push(newMessage);
-        io.emit("message", messageList);
+        io.to("main-room").emit("message", messageList);
     });
 
 });

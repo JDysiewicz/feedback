@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import io from "socket.io-client";
+import { downloadFeedback } from "./utils/dowloadFeedback";
 const ENDPOINT = "localhost:5000";
 
 interface Message{
@@ -46,12 +47,15 @@ const App: React.FC = () => {
         return;
     };
 
+    
+
     return(
         <div>
             <h1>Hello</h1>
             <ul>
                 {renderList()}
             </ul>
+            <button onClick={() => downloadFeedback(messageList)}>Download Feedback</button>
             <input value={message} placeholder="Write a message" onChange={(e) => setMessage(e.target.value)} />
             <button onClick={() => handleClick()}>Submit Message</button>
         </div>

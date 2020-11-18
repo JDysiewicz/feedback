@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import io from "socket.io-client";
 import { downloadFeedback } from "./utils/dowloadFeedback";
+import { Message } from "../types";
+
+// Outside main App so doesn't create a new socket on every 
+// component re-render
 const ENDPOINT = "localhost:5000";
-
-interface Message{
-    user: string;
-    message: string;
-    upvotes: number;
-}
-
 const socket: SocketIOClient.Socket = io(ENDPOINT);
 socket.connect();
 
@@ -46,8 +43,6 @@ const App: React.FC = () => {
         setMessage("");
         return;
     };
-
-    
 
     return(
         <div>

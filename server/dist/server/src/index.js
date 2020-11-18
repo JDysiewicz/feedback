@@ -15,9 +15,9 @@ app.use(function (req, res, next) {
 });
 app.use(cors());
 app.options('*', cors());
-app.use(express_1.default.static(path_1.default.join(__dirname, '../../../build')));
+app.use(express_1.default.static(path_1.default.join(__dirname, '../../build')));
 app.get('*', (req, res) => {
-    res.sendFile(path_1.default.join(__dirname, "../../../build", "index.html"));
+    res.sendFile(path_1.default.join(__dirname, "../../build", "index.html"));
 });
 exports.default = app;
 //# sourceMappingURL=index.js.map

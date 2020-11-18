@@ -1,8 +1,4 @@
-interface Message{
-    user: string;
-    message: string;
-    upvotes: number;
-}
+import { Message } from "../../types";
 
 export const downloadFeedback = (messageList: Message[]): void => {
     let csvContent = "data:text/csv;charset=utf-8,";

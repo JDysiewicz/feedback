@@ -1,37 +1,23 @@
-import { Socket } from "socket.io";
-import app from "../index";
-
-
-const PORT = process.env.PORT || 5000;
-const messageList: Array<{user: string; message: string; upvotes: number}> = [];
-// WebSocket setup
+// Imports
 const socketio =  require("socket.io");
 const http = require("http");
+import app from "../index";
+import { socketSetup } from "./socketFunctions/index";
+
+// Constants
+const SOCKET_URL = process.env.SOCKET_URL || "http://localhost:3000";
+const PORT = process.env.PORT || 5000;
+
+// WebSockets
 const server = http.createServer(app);
-const io = socketio(server, {cors: {origin: "http://localhost:3000", methods:["GET", "POST"] }});
+const io: SocketIO.Server = socketio(server, {cors: {origin: SOCKET_URL, methods:["GET", "POST"] }});
+socketSetup(io);
 
-io.on("connection", (socket: Socket) => {
-    console.log("USER JOINED!")
-    socket.join("main-room");
-    // Send all the curent messages to the new connection
-    socket.to("main-room").emit("message", messageList);
-
-    socket.on("upvote", ({message, value}) => {
-        const idx: number = messageList.findIndex(msg => msg.message === message.message);
-        messageList[idx] = {...message, upvotes: message.upvotes+value};
-        io.to("main-room").emit("message", messageList);
-    });
-
-    // Update messageList with newMessage and send the update to everyone
-    socket.on("message", newMessage => {
-        messageList.push(newMessage);
-        io.to("main-room").emit("message", messageList);
-    });
-
-});
-
+// Run server
 server.listen(PORT, () => {
     console.log(`Now listening on port ${PORT}`);
 });
 
-export default io;
+
+
+

@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 const cors = require("cors");
 const app = express();
 
@@ -11,5 +12,11 @@ app.use(function(req, res, next) {
 });
 app.use(cors());
 app.options('*', cors());
+
+// out 4 times for build as when built with tsc will be ready
+app.use(express.static(path.join(__dirname, '../../../../build')));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, "../../../../build", "index.html"))
+});
 
 export default app;

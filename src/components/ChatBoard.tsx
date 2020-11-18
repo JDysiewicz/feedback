@@ -6,7 +6,10 @@ import { Message } from "../../types";
 
 // Outside main App so doesn't create a new socket on every 
 // component re-render.
-const ENDPOINT = "localhost:5000";
+// const ENDPOINT = process.env.ENDPOINT || "localhost:5000";
+const ENDPOINT = process.env.NODE_ENV === "production" ?
+    "https://feedback-dysiewicz.herokuapp.com" :
+    "localhost:5000";
 
 const ChatBoard: React.FC = (): JSX.Element => {
 

@@ -13,9 +13,10 @@ app.use(function(req, res, next) {
 app.use(cors());
 app.options('*', cors());
 
-app.use(express.static(path.join(__dirname, '../../build')));
+// out 4 times for build as when built with tsc will be ready
+app.use(express.static(path.join(__dirname, '../../../../build')));
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, "../../build", "index.html"))
+    res.sendFile(path.join(__dirname, "../../../../build", "index.html"))
 });
 
 export default app;

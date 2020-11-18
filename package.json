@@ -30,7 +30,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint src/**/*.{ts,js,tsx,jsx}"
+    "lint": "eslint src/**/*.{ts,js,tsx,jsx}",
+    "start:heroku": "node dist/server/src/bin/server.js"
   },
   "eslintConfig": {
     "extends": [

@@ -5,7 +5,8 @@ import app from "../index";
 import { socketSetup } from "./socketFunctions/index";
 
 // Constants
-const SOCKET_URL = process.env.SOCKET_URL || "http://localhost:3000";
+// const SOCKET_URL = process.env.SOCKET_URL || "http://localhost:3000";
+const SOCKET_URL = "https://feedback-dysiewicz.herokuapp.com";
 const PORT = process.env.PORT || 5000;
 
 // WebSockets

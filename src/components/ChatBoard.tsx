@@ -14,13 +14,15 @@ const ChatBoard: React.FC = (): JSX.Element => {
 
     const [messageList, setMessageList] = useState<Message[]>([]);
     const [message, setMessage] = useState<string>("");
-    // const [boardId, setBoardId] = useState<string>("");
+    // const [title, setTitle] = useState<string>("Feedback Board");
+
+    const [boardId, setBoardId] = useState<string>("");
     const [socket, setSocket] = useState<SocketIOClient.Socket>();
 
     useEffect(() => {
         if (window.location.search === "") return;
         const newBoardId = qs.parse(window.location.search).board as string;
-        // setBoardId(newBoardId);
+        setBoardId(newBoardId);
         setSocket(io.connect(ENDPOINT, {query: `board=${newBoardId}`}));
 
         return () => {
@@ -63,7 +65,10 @@ const ChatBoard: React.FC = (): JSX.Element => {
 
     return(
         <div>
-            <h1>Hello</h1>
+            {/* <input style={{border: "none", fontSize: "3rem"}}
+                value={title} onChange={(e) => setTitle(e.target.value)} /> */}
+            <h1>Anonymous Feedback</h1>
+            <h2>RoomID: {boardId}</h2>
             <ul>
                 {renderList()}
             </ul>

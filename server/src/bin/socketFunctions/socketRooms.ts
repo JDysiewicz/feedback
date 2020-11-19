@@ -7,8 +7,9 @@ import { boardMessageLists } from "../../utils/boardMessageLists";
 export const socketRooms = (socket: Socket, io: SocketIO.Server, boardId: string) => {
     socket.join(boardId);
     if (boardMessageLists.filter(messageList => messageList.boardId === boardId).length === 0) {
-        const newBoardMessageList: BoardMessageList = {boardId: boardId, messages: [] as Message[]};
+        const newBoardMessageList: BoardMessageList = {creator: socket.id, boardId: boardId, messages: [] as Message[], hideVotes: true};
         boardMessageLists.push(newBoardMessageList);
     }
+    console.log(boardMessageLists);
 };
 

@@ -1,17 +1,34 @@
-import React, { useState } from "react";
-import { Redirect } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { StaticContext } from "react-router";
+import { Redirect, RouteComponentProps } from "react-router-dom";
 
 // import ChatBoard from "./components/ChatBoard";
 
-const SplashScreen: React.FC = (): JSX.Element => {
+interface NewRoomProps{
+    search: string;
+    roomCreator: boolean;
+}
 
+interface SplashScreenLocationState{
+    message: string;
+}
+
+const SplashScreen: React.FC<RouteComponentProps<any, StaticContext, SplashScreenLocationState>> = (props: RouteComponentProps<any, StaticContext, SplashScreenLocationState>): JSX.Element => {
     const [roomId, setRoomId] = useState<string>("");
-    const [redirect, setRedirect] = useState<string>("");
+    const [redirect, setRedirect] = useState<NewRoomProps>();
 
+    useEffect(() => {
+        if (props.location.state !== undefined){
+            alert(props.location.state.message);
+        }
+    }, []);
+
+    // Right now, no checking for if roomId exists - just relying on that 1/million chance of two rooms simultaneously
+    // existing :/
     const createRoom = () => {
-        const tempRoomId = Math.random().toString();
-        const tempLink = `/board?board=${tempRoomId}`;
-        setRedirect(tempLink);
+        const newRoomId = (Math.random()*1000000).toString().split(".")[0];
+        const newRoomProps: NewRoomProps = {search: `?board=${newRoomId}`, roomCreator: true };
+        setRedirect(newRoomProps);
     };
 
     const joinRoom = () => {
@@ -20,10 +37,19 @@ const SplashScreen: React.FC = (): JSX.Element => {
             return;
         }
         // Check whether rooms exists via express route and axios later
-        setRedirect(`/board?board=${roomId}`);
+        setRedirect({search: `?board=${roomId}`, roomCreator: false});
     };
 
-    if (redirect.length !== 0) return <Redirect to={redirect} />;
+    // Redirects to the feedback board passing in the appropriate props to props.location.state
+    if (redirect !== undefined){
+        return (
+            <Redirect to={{
+                pathname: "/board",
+                search: redirect.search,
+                state: { roomCreator: redirect.roomCreator }
+            }} />
+        );
+    }
 
     return (
         <div>

@@ -21,7 +21,7 @@ export const socketMessages = (socket: Socket, io: SocketIO.Server, boardId: str
 
     socket.on("toggle-votes", () => {
         boardMessageLists[boardId].hideVotes = !boardMessageLists[boardId].hideVotes
-        io.emit("toggle-votes");
+        io.to(boardId).emit("toggle-votes");
     });
     
     // Update messageList with newMessage and send the update to everyone

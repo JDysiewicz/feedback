@@ -11,10 +11,10 @@ const generateId = () => {
     return id;
 };
 
-export const addIdToMessage = (newMessage: {user: string, message: string, upvotes: number}, boardIdx: number): Message => {
+export const addIdToMessage = (newMessage: {user: string, message: string, upvotes: number}, boardId: string): Message => {
     // Generated random 8 length string of number/letters
-    console.log("REPLICATING", boardMessageLists)
-    const currentIds = boardMessageLists[boardIdx].messages.map(message => message.id);
+
+    const currentIds = boardMessageLists[boardId].messages.map(message => message.id);
 
     // Generate an ID that isn't already in use
     let id = generateId();

@@ -19,7 +19,7 @@ export const socketSetup = (io: SocketIO.Server) => {
         const boardId: string = socketQueries.board;
         socketRooms(socket, io, boardId);
         socketMessages(socket, io, boardId);
-        socketDisconnect(socket, io);
+        socketDisconnect(socket, io, boardId);
     });
 };
 

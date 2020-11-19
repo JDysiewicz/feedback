@@ -10,5 +10,8 @@ export interface BoardMessageList{
     messages: Message[];
     hideVotes: boolean;
 };
+export interface BoardMessageListObject {
+    [key: string]: BoardMessageList
+};
 
 

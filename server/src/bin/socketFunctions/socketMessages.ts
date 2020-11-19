@@ -8,28 +8,26 @@ import { Message } from "../../../../types";
 
 
 export const socketMessages = (socket: Socket, io: SocketIO.Server, boardId: string) => {
-    const boardMessageListIdx = boardMessageLists.findIndex(messageList => messageList.boardId === boardId);
-    console.log(boardMessageLists[boardMessageListIdx].hideVotes);
     // When new socket joins, give them the current messageList
-    socket.emit("initial-vote-visibility", boardMessageLists[boardMessageListIdx].hideVotes);
-    socket.emit("message", boardMessageLists[boardMessageListIdx].messages);
+    socket.emit("initial-vote-visibility", boardMessageLists[boardId].hideVotes);
+    socket.emit("message", boardMessageLists[boardId].messages);
     
     // Controls the voting
     socket.on("upvote", ({message, value}: {message: Message, value: number}) => {
-        const idx: number = boardMessageLists[boardMessageListIdx].messages.findIndex(msg => msg.id === message.id);
-        boardMessageLists[boardMessageListIdx].messages[idx] = {...message, upvotes: message.upvotes+value};
-        io.to(boardId).emit("message", boardMessageLists[boardMessageListIdx].messages);
+        const idx: number = boardMessageLists[boardId].messages.findIndex(msg => msg.id === message.id);
+        boardMessageLists[boardId].messages[idx] = {...message, upvotes: message.upvotes+value};
+        io.to(boardId).emit("message", boardMessageLists[boardId].messages);
     });
 
     socket.on("toggle-votes", () => {
-        boardMessageLists[boardMessageListIdx].hideVotes = !boardMessageLists[boardMessageListIdx].hideVotes
+        boardMessageLists[boardId].hideVotes = !boardMessageLists[boardId].hideVotes
         io.emit("toggle-votes");
     });
     
     // Update messageList with newMessage and send the update to everyone
     socket.on("message", (newMessage: {user: string, message: string, upvotes: number }) => {
-        const generatedNewMessage: Message = addIdToMessage(newMessage, boardMessageListIdx)
-        boardMessageLists[boardMessageListIdx].messages.push(generatedNewMessage);
-        io.to(boardId).emit("message", boardMessageLists[boardMessageListIdx].messages);
+        const generatedNewMessage: Message = addIdToMessage(newMessage, boardId)
+        boardMessageLists[boardId].messages.push(generatedNewMessage);
+        io.to(boardId).emit("message", boardMessageLists[boardId].messages);
     });
 };

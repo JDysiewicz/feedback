@@ -3,12 +3,7 @@ import { socketRooms } from "./socketRooms";
 import { socketMessages } from "./socketMessages";
 import { socketDisconnect } from "./socketDisconnect";
 
-interface SocketQuery{
-    EIO?: string;
-    transport?: string;
-    t?: string;
-    board?: string;
-}
+import { SocketQuery } from "../../../../types";
 
 // Wrapper for all socketFunctions via io.on("Connection")
 export const socketSetup = (io: SocketIO.Server) => {

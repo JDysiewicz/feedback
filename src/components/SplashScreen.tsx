@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { StaticContext } from "react-router";
 import { Redirect, RouteComponentProps } from "react-router-dom";
 
+import { NewRoomProps, SplashScreenLocationState } from "../../types";
+
 // import ChatBoard from "./components/ChatBoard";
 
-interface NewRoomProps{
-    search: string;
-    roomCreator: boolean;
-}
 
-interface SplashScreenLocationState{
-    message: string;
-}
 
 const SplashScreen: React.FC<RouteComponentProps<any, StaticContext, SplashScreenLocationState>> = (props: RouteComponentProps<any, StaticContext, SplashScreenLocationState>): JSX.Element => {
     const [roomId, setRoomId] = useState<string>("");
@@ -31,13 +27,22 @@ const SplashScreen: React.FC<RouteComponentProps<any, StaticContext, SplashScree
         setRedirect(newRoomProps);
     };
 
-    const joinRoom = () => {
+    const joinRoom = async () => {
         if (roomId === ""){
             console.log("Room ID empty");
             return;
         }
-        // Check whether rooms exists via express route and axios later
-        setRedirect({search: `?board=${roomId}`, roomCreator: false});
+
+        try {
+            const existingRoom = await axios.get("/api/valid-room", {params: {boardId: roomId}});
+            if (!existingRoom) return console.log("No room by that name!");
+            // Check whether rooms exists via express route and axios later
+            setRedirect({search: `?board=${roomId}`, roomCreator: false});
+        } catch (err: any) {
+            alert(`ERROR: ${err.response.data.message}`);
+            setRoomId("");
+        }
+        return;
     };
 
     // Redirects to the feedback board passing in the appropriate props to props.location.state

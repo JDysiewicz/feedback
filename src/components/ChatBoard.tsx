@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import qs from "query-string";
 import io from "socket.io-client";
 import { downloadFeedback } from "../utils/dowloadFeedback";
-import { Message } from "../../types";
+import { Message, ChatBoardLocationState, PersonalVotedMessage } from "../../types";
 import { Redirect, RouteComponentProps, StaticContext } from "react-router";
 import CreatorOptions from "./CreatorOptions";
 
@@ -12,15 +12,6 @@ import CreatorOptions from "./CreatorOptions";
 const ENDPOINT = process.env.NODE_ENV === "production" ?
     "https://feedback-dysiewicz.herokuapp.com" :
     "localhost:5000";
-
-interface ChatBoardLocationState {
-    roomCreator: boolean;
-}
-
-interface PersonalVotedMessage {
-    messageId: string;
-    personalVotes: number;
-}
 
 const NUM_VOTES = 3;
 

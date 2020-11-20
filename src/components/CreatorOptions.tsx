@@ -1,10 +1,5 @@
 import React from "react";
-
-interface CreatorOptionsProps {
-    socket: SocketIOClient.Socket;
-    boardId: string;
-    toggleHideVotes: () => void;
-}
+import { CreatorOptionsProps } from "../../types";
 
 const CreatorOptions: React.FC<CreatorOptionsProps> = (props: CreatorOptionsProps): JSX.Element => {
     return (

@@ -3,6 +3,9 @@ import path from "path";
 const cors = require("cors");
 const app = express();
 
+import apiRouter from "./bin/routes/apiRouter";
+import errorHandler from "./errors/errorHandler";
+
 // CORS stuff
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -12,6 +15,10 @@ app.use(function(req, res, next) {
 });
 app.use(cors());
 app.options('*', cors());
+
+// Routing
+app.use("/api", apiRouter);
+app.use(errorHandler);
 
 // out 4 times for build as when built with tsc will be ready
 app.use(express.static(path.join(__dirname, '../../../../build')));

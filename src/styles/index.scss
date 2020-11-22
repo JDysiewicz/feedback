@@ -1,0 +1,139 @@
+/* Color Palette */
+$main-red: #e80d1e;
+$main-brown: #dc978a;
+$main-pale: #ffe5db;
+$main-blue: #57babb;
+
+
+
+html {
+    @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap');
+    font-family: Source Sans Pro, sans-serif;
+    box-sizing: border-box;
+}
+
+.SplashScreen-main-div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    max-width: 50rem;
+    min-width: 20rem;
+    margin: 0 auto;
+    border-radius: 20px;
+    margin-top: 5%;
+    font-size: 25px;
+    font-weight: 700;    
+
+    & button, input {
+        font-size: 25px;
+        font-weight: 700;
+        background-color: $main-red;
+        border: none;
+        color: white;
+        margin: 1em;
+        border-radius: 10px;
+        text-align: center;
+        padding: 5px;
+        width: 100%;
+    }
+
+    & .SplashScreen-join-room {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+}
+
+.ChatBoard-main-div {
+    display: flex;
+    flex-direction: column;
+
+    & button {
+    background-color: $main-red;
+    border: none;
+    color: white;
+    margin: 1em;
+    border-radius: 10px;
+    text-align: center;
+    padding: 5px;
+    font-weight: 700;
+    }
+
+    & .ChatBoard-download {
+        background-color: $main-red;
+        width: 50%;
+        align-self: center;
+    }
+
+    & .ChatBoard-info {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    & .ChatBoard-temp {
+        display: flex;
+        align-self: center;
+    }
+
+    & .ChatBoard-write-message {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 50%;
+        align-self: center;
+        margin: 2rem;
+
+        & textarea {
+            font-family: "Source Sans Pro";
+            border: 1px solid black;
+            border-radius: 5px;
+            background-color: $main-pale;
+            resize: none;
+            padding: 10px;
+        }
+    }
+
+    & .ChatBoard-feedback-list {
+        align-self: center;
+        background-color: $main-blue;
+        padding: 1rem;
+        border-radius: 10px;
+        width: 90%;
+        text-align: center;
+        max-height: 50vh;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        word-wrap: break-word;
+        color: black;
+    }
+}
+
+.FeedbackMessage-main-div {
+    background-color: $main-pale;
+    color: black;
+    font-weight: 500;
+    border-radius: 10px;
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+
+    & p {
+        margin: 5px
+    }
+
+    & button {
+        margin: 5px;
+        width: 20%;
+    }
+
+    & .FeedbackMessage-votes {
+        display: flex;
+        align-self: center;
+    }
+}

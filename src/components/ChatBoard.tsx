@@ -106,6 +106,7 @@ const ChatBoard: React.FC<RouteComponentProps<any, StaticContext, ChatBoardLocat
 
     const handleClick = (): void => {
         if (message.length === 0) return alert("Message cannot be empty");
+        if (message.includes("\n")) return alert("New line characters are not permitted");
         const user: string = socket.id;
         const newMessage = {user, message, upvotes: 0};
         socket.emit("message", newMessage);
@@ -117,20 +118,21 @@ const ChatBoard: React.FC<RouteComponentProps<any, StaticContext, ChatBoardLocat
 
     return(
         <div className="ChatBoard-main-div">
-
-            <div className="ChatBoard-info">
-                <h1>Anonymous Feedback (RoomID: {boardId})</h1>
+            <div className="ChatBoard-header-content">
+                <div className="ChatBoard-info">
+                    <div>
+                        <h1>Anonymous Feedback</h1>
+                        <h3>RoomID: {boardId}</h3>
+                    </div>
+                </div>
+                <div className="ChatBoard-temp">
+                    {didCreateRoom && <CreatorOptions socket={socket} boardId={boardId} toggleHideVotes={toggleHideVotes}/>}
+                </div>
+                <button className="ChatBoard-download" onClick={() => downloadFeedback(messageList)}>Download Feedback</button>
+                {warning && <h3 style={{color: "red"}}>{warning}</h3>}
             </div>
-            <div className="ChatBoard-temp">
-                <p><strong>3 Votes Per Item</strong></p>
-                {didCreateRoom && <CreatorOptions socket={socket} boardId={boardId} toggleHideVotes={toggleHideVotes}/>}
-            </div>
-            <button className="ChatBoard-download" onClick={() => downloadFeedback(messageList)}>Download Feedback</button>
-            {warning && <h3 style={{color: "red"}}>{warning}</h3>}
-
             <div className="ChatBoard-feedback-list">
-                <h2>Feedback List</h2>
-                <div>
+                <div className="ChatBoard-feedback-grid">
                     {renderList()}
                 </div>
             </div>

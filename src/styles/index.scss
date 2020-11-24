@@ -52,6 +52,14 @@ html {
     display: flex;
     flex-direction: column;
 
+    & .ChatBoard-header-content {
+        align-self: center;
+        display: flex;
+        width: 95%;
+        justify-content: space-around;
+        align-items: center;
+    }
+
     & button {
     background-color: $main-red;
     border: none;
@@ -103,13 +111,19 @@ html {
         background-color: $main-blue;
         padding: 1rem;
         border-radius: 10px;
-        width: 90%;
+        width: 95%;
         text-align: center;
-        max-height: 50vh;
+        height: 50vh;
         overflow-y: scroll;
         overflow-x: hidden;
         word-wrap: break-word;
         color: black;
+    }
+
+    & .ChatBoard-feedback-grid{
+        display: grid;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: repeat(20%, auto);
     }
 }
 
@@ -121,7 +135,7 @@ html {
     font-size: 20px;
     display: flex;
     flex-direction: column;
-    margin-bottom: 10px;
+    margin: 10px;
 
     & p {
         margin: 5px

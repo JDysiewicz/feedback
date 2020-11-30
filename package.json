@@ -35,7 +35,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint src/**/*.{ts,js,tsx,jsx}",
+    "lint": "eslint src/**/*.{ts,tsx}",
     "start:heroku": "node server/dist/server/src/bin/server.js",
     "heroku-postbuild": "npm install --prefix ./server"
   },

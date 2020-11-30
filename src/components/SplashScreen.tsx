@@ -3,7 +3,11 @@ import axios from "axios";
 import { StaticContext } from "react-router";
 import { Redirect, RouteComponentProps } from "react-router-dom";
 import { NewRoomProps, SplashScreenLocationState } from "../../types";
+import { isAxiosError } from "src/utils/isAxiosError";
 
+// eslint disable here as RouteComponentProps needs an any as first argument
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const SplashScreen: React.FC<RouteComponentProps<any, StaticContext, SplashScreenLocationState>> = (props: RouteComponentProps<any, StaticContext, SplashScreenLocationState>): JSX.Element => {
     const [roomId, setRoomId] = useState<string>("");
     const [redirect, setRedirect] = useState<NewRoomProps>();
@@ -33,8 +37,17 @@ const SplashScreen: React.FC<RouteComponentProps<any, StaticContext, SplashScree
             if (!existingRoom) return console.log("No room by that name!");
             // Check whether rooms exists via express route and axios later
             setRedirect({search: `?board=${roomId}`, roomCreator: false});
-        } catch (err: any) {
-            alert(`ERROR: ${err.response.data.message}`);
+        } catch (err: unknown) {
+            if (isAxiosError(err)) {
+                if (err.response?.status === 400){
+                    alert(err.response.data.message + ` (${roomId})`);
+                    
+                } else {
+                    alert("Something went wrong.");
+                }
+            } else {
+                alert("Something went wrong.");
+            }
             setRoomId("");
         }
         return;

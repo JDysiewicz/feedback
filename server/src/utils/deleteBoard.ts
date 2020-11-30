@@ -9,9 +9,7 @@ export const deleteBoard = (boardId: string, io: SocketIO.Server) => {
 
     setTimeout(() => {
         // Delete the message list from that room
-        console.log("BEFORE", boardMessageLists);
         delete boardMessageLists[boardId];
-        console.log("AFTER", boardMessageLists);
     }, TIMEOUT);
 
     return;

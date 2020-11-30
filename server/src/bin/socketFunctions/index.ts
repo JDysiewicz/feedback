@@ -12,6 +12,7 @@ export const socketSetup = (io: SocketIO.Server) => {
         const socketQueries: SocketQuery = socket.handshake.query;
         if (socketQueries.board === undefined) return;
         const boardId: string = socketQueries.board;
+        console.log("Board ID: ", boardId);
         socketRooms(socket, io, boardId);
         socketMessages(socket, io, boardId);
         socketDisconnect(socket, io, boardId);

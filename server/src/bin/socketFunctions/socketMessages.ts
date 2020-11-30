@@ -26,8 +26,13 @@ export const socketMessages = (socket: Socket, io: SocketIO.Server, boardId: str
     
     // Update messageList with newMessage and send the update to everyone
     socket.on("message", (newMessage: {user: string, message: string, upvotes: number }) => {
-        const generatedNewMessage: Message = addIdToMessage(newMessage, boardId)
-        boardMessageLists[boardId].messages.push(generatedNewMessage);
-        io.to(boardId).emit("message", boardMessageLists[boardId].messages);
+        const generatedNewMessage: Message | Error = addIdToMessage(newMessage, boardId);
+        if (generatedNewMessage instanceof Error) {
+            socket.emit("error", generatedNewMessage.message);
+            return;
+        } else {
+            boardMessageLists[boardId].messages.push(generatedNewMessage);
+            io.to(boardId).emit("message", boardMessageLists[boardId].messages);
+        }
     });
 };

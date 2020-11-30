@@ -56,6 +56,10 @@ const ChatBoard: React.FC<RouteComponentProps<any, StaticContext, ChatBoardLocat
         setMessageList(messageList);
     });
 
+    socket.on("error", (errorMessage: string) => {
+        alert(`Error: ${errorMessage}`);
+    });
+
     socket.on("initial-vote-visibility", (voteVis: boolean) => {
         console.log("VOTE VIS", voteVis);
         setHideVotes(voteVis);

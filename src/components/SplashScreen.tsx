@@ -2,12 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { StaticContext } from "react-router";
 import { Redirect, RouteComponentProps } from "react-router-dom";
-
 import { NewRoomProps, SplashScreenLocationState } from "../../types";
-
-// import ChatBoard from "./components/ChatBoard";
-
-
 
 const SplashScreen: React.FC<RouteComponentProps<any, StaticContext, SplashScreenLocationState>> = (props: RouteComponentProps<any, StaticContext, SplashScreenLocationState>): JSX.Element => {
     const [roomId, setRoomId] = useState<string>("");
@@ -29,7 +24,7 @@ const SplashScreen: React.FC<RouteComponentProps<any, StaticContext, SplashScree
 
     const joinRoom = async () => {
         if (roomId === ""){
-            console.log("Room ID empty");
+            alert("Room ID empty");
             return;
         }
 
@@ -57,10 +52,15 @@ const SplashScreen: React.FC<RouteComponentProps<any, StaticContext, SplashScree
     }
 
     return (
-        <div>
+        <div className="SplashScreen-main-div">
+            <h1>Anonymous Feedback</h1>
             <button onClick={() => createRoom()}>Create a room</button>
-            <input value={roomId} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRoomId(e.target.value)} placeholder="Room ID" />
-            <button onClick={() => joinRoom()}>Join an existing room using Room ID</button>
+            <h3>OR</h3>
+            <div className="SplashScreen-join-room">
+                <label htmlFor="room-id">RoomID:</label>
+                <input id="room-id" name="room-id" value={roomId} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRoomId(e.target.value)} placeholder="Enter Room ID" />
+                <button onClick={() => joinRoom()}>Join an existing room using Room ID</button>
+            </div>
         </div>
     );
 };

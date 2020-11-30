@@ -5,7 +5,7 @@ import { downloadFeedback } from "../utils/dowloadFeedback";
 import { Message, ChatBoardLocationState, PersonalVotedMessage } from "../../types";
 import { Redirect, RouteComponentProps, StaticContext } from "react-router";
 import CreatorOptions from "./CreatorOptions";
-
+import FeedbackMessage from "./FeedbackMessage";
 // Outside main App so doesn't create a new socket on every 
 // component re-render.
 // const ENDPOINT = process.env.ENDPOINT || "localhost:5000";
@@ -91,15 +91,7 @@ const ChatBoard: React.FC<RouteComponentProps<any, StaticContext, ChatBoardLocat
             const indexOfVoted = votedMessages.findIndex(msg => msg.messageId === message.id);
             const personalVote = indexOfVoted === -1 ? 0 : votedMessages[indexOfVoted].personalVotes;
             return (
-                <li key={message.id}>
-                    <div style={{display: "flex"}}>
-                        <p>Message: {message.message} </p>
-                        <p>Personal Votes: {personalVote}</p>
-                        {!hideVotes && <p>Total Votes: {message.upvotes}</p>}
-                        <button onClick={() => voteMessage(message, 1)}>Upvote</button>
-                        <button onClick={() => voteMessage(message, -1)}>Downvote</button>
-                    </div>
-                </li>
+                <FeedbackMessage key={message.id} hideVotes={hideVotes} voteMessage={voteMessage} message={message} personalVote={personalVote} />
             );
         });
     };
@@ -113,6 +105,8 @@ const ChatBoard: React.FC<RouteComponentProps<any, StaticContext, ChatBoardLocat
     });
 
     const handleClick = (): void => {
+        if (message.length === 0) return alert("Message cannot be empty");
+        if (message.includes("\n")) return alert("New line characters are not permitted");
         const user: string = socket.id;
         const newMessage = {user, message, upvotes: 0};
         socket.emit("message", newMessage);
@@ -123,20 +117,32 @@ const ChatBoard: React.FC<RouteComponentProps<any, StaticContext, ChatBoardLocat
     if (redirect) return <Redirect to={{pathname: "/", state: {message: "Disconnected due to admin inactivity"}}} />;
 
     return(
-        <div>
-            {/* <input style={{border: "none", fontSize: "3rem"}}
-                value={title} onChange={(e) => setTitle(e.target.value)} /> */}
-            <h1>Anonymous Feedback</h1>
-            <h2>RoomID: {boardId}</h2>
-            {warning && <h2 style={{color: "red"}}>{warning}</h2>}
-            <ul>
-                {renderList()}
-            </ul>
-            <button onClick={() => downloadFeedback(messageList)}>Download Feedback</button>
-            <input value={message} placeholder="Write a message" onChange={(e) => setMessage(e.target.value)} />
-            <button onClick={() => handleClick()}>Submit Message</button>
-            <p><strong>3 Votes Per Item</strong></p>
-            {didCreateRoom && <CreatorOptions socket={socket} boardId={boardId} toggleHideVotes={toggleHideVotes}/>}
+        <div className="ChatBoard-main-div">
+            <div className="ChatBoard-header-content">
+                <div className="ChatBoard-info">
+                    <div>
+                        <h1>Anonymous Feedback</h1>
+                        <h3>RoomID: {boardId}</h3>
+                    </div>
+                </div>
+                <div className="ChatBoard-temp">
+                    {didCreateRoom && <CreatorOptions socket={socket} boardId={boardId} toggleHideVotes={toggleHideVotes}/>}
+                </div>
+                <button className="ChatBoard-download" onClick={() => downloadFeedback(messageList)}>Download Feedback</button>
+                {warning && <h3 style={{color: "red"}}>{warning}</h3>}
+            </div>
+            <div className="ChatBoard-feedback-list">
+                <div className="ChatBoard-feedback-grid">
+                    {renderList()}
+                </div>
+            </div>
+            
+            <div className="ChatBoard-write-message">
+                <label htmlFor="write-message">Write a Message: </label>
+                <textarea id="write-message" name="write-message" value={message} placeholder="Write a message" onChange={(e) => setMessage(e.target.value)} />
+                
+                <button id="submit-message" name="submit-message" onClick={() => handleClick()}>Submit Message</button>
+            </div>
         </div>
     );
 };

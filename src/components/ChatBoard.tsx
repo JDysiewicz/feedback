@@ -15,6 +15,7 @@ const ENDPOINT = process.env.NODE_ENV === "production" ?
 
 const NUM_VOTES = 3;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ChatBoard: React.FC<RouteComponentProps<any, StaticContext, ChatBoardLocationState>> = (props: RouteComponentProps<any, StaticContext, ChatBoardLocationState>): JSX.Element => {
 
     // Return nothing if not redirected here

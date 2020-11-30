@@ -44,3 +44,12 @@ export interface SocketQuery{
     t?: string;
     board?: string;
 }
+
+// export interface AxiosError extends Error {
+//     config: object;
+//     code?: string;
+//     request: object;
+//     response: object;
+//     isAxiosError: boolean;
+//     toJSON: () => object;
+// }

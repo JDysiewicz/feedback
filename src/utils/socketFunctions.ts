@@ -16,9 +16,9 @@ export const socketOnError
 };
 
 export const socketOnVoteVis
-= (socket: SocketIOClient.Socket, setHideVotes: (voteVis: boolean) => void): void => {
-    socket.on("toggle-votes", (voteVis: boolean) => {
-        setHideVotes(voteVis);
+= (socket: SocketIOClient.Socket, setHideVotes: (hideVotes: boolean) => void, hideVotes: boolean): void => {
+    socket.on("toggle-votes", () => {
+        setHideVotes(!hideVotes);
     });
 };
 

@@ -51,7 +51,7 @@ React.FC<ChatBoardProps>
     // Socket functions
     socketOnMessageList(socket, setMessageList);
     socketOnError(socket);
-    socketOnVoteVis(socket, setHideVotes);
+    socketOnVoteVis(socket, setHideVotes, hideVotes);
     socketOnCreatorDC(socket, setWarning, setRedirect);
     
     const voteMessage = (message: Message, value: number) => {

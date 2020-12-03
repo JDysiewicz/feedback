@@ -1,57 +1,51 @@
 import React, { useState, useEffect } from "react";
-import qs from "query-string";
+import { Redirect } from "react-router";
 import io from "socket.io-client";
+
 import { downloadFeedback } from "../utils/dowloadFeedback";
-import { Message, ChatBoardLocationState, PersonalVotedMessage } from "../../types";
-import { Redirect, RouteComponentProps, StaticContext } from "react-router";
+import { Message, PersonalVotedMessage } from "../../types";
 import CreatorOptions from "./CreatorOptions";
 import FeedbackMessage from "./FeedbackMessage";
+
 // Outside main App so doesn't create a new socket on every 
 // component re-render.
-// const ENDPOINT = process.env.ENDPOINT || "localhost:5000";
 const ENDPOINT = process.env.NODE_ENV === "production" ?
     "https://feedback-dysiewicz.herokuapp.com" :
     "localhost:5000";
 
 const NUM_VOTES = 3;
 
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ChatBoard: React.FC<RouteComponentProps<any, StaticContext, ChatBoardLocationState>> = (props: RouteComponentProps<any, StaticContext, ChatBoardLocationState>): JSX.Element => {
+// const ChatBoard:
+// React.FC<RouteComponentProps<any, StaticContext, ChatBoardLocationState>>
+// = (props: RouteComponentProps<any, StaticContext, ChatBoardLocationState>): JSX.Element => {
 
-    // Return nothing if not redirected here
-    if (props.location.search === "") return <div>Please create or join a room</div>;
+const ChatBoard:
+React.FC<any>
+= (props: any): JSX.Element => {
 
+    
     const [messageList, setMessageList] = useState<Message[]>([]);
     const [message, setMessage] = useState<string>("");
-    const [boardId, setBoardId] = useState<string>("");
     const [socket, setSocket] = useState<SocketIOClient.Socket>();
-    const [didCreateRoom, setDidCreateRoom] = useState<boolean>(false);
     const [redirect, setRedirect] = useState<string>("");
     const [warning, setWarning] = useState<string>();
     const [hideVotes, setHideVotes] = useState<boolean>(true);
     const [votedMessages, setVotedMessages] = useState<PersonalVotedMessage[]>([]);
 
+    // Set up socket connection
     useEffect(() => {
-        // Don't run if there's no search param for the board - here as a safety net from above
-        if (props.location.search === "") return;
-
-        // If here from the Redirect or not
-        if (props.location.state !== undefined){
-            const didCreate = props.location.state.roomCreator;
-            setDidCreateRoom(didCreate);
-        }
-        const newBoardId = qs.parse(props.location.search).board as string;
-        setBoardId(newBoardId);
-        setSocket(io.connect(ENDPOINT, {query: `board=${newBoardId}`}));
-
+        setSocket(io.connect(ENDPOINT, {query: `board=${props.boardId}`}));
         return () => {
             if (socket) socket.disconnect();
         };
     }, []);
 
+    // Return loading spinner while socket waiting to be setup
     if (!socket) return <div></div>;
 
-
+    // Socket functions - extract
     socket.on("message", (messageList: Message[]) => {
         setMessageList(messageList);
     });
@@ -127,11 +121,11 @@ const ChatBoard: React.FC<RouteComponentProps<any, StaticContext, ChatBoardLocat
                 <div className="ChatBoard-info">
                     <div>
                         <h1>Anonymous Feedback</h1>
-                        <h3>RoomID: {boardId}</h3>
+                        <h3>RoomID: {props.boardId}</h3>
                     </div>
                 </div>
                 <div className="ChatBoard-temp">
-                    {didCreateRoom && <CreatorOptions socket={socket} boardId={boardId} toggleHideVotes={toggleHideVotes}/>}
+                    {props.didCreate && <CreatorOptions socket={socket} boardId={props.boardId} toggleHideVotes={toggleHideVotes}/>}
                 </div>
                 <button className="ChatBoard-download" onClick={() => downloadFeedback(messageList)}>Download Feedback</button>
                 {warning && <h3 style={{color: "red"}}>{warning}</h3>}

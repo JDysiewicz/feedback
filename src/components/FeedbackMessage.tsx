@@ -1,15 +1,10 @@
 import React from "react";
 
-import { Message } from "../../types";
+import { FeedbackMessageProps } from "../../types";
 
-interface FeedbackMessageProps {
-    message: Message;
-    personalVote: number;
-    voteMessage: (message: Message, value: number) => void;
-    hideVotes: boolean;
-}
-
-const FeedbackMessage: React.FC<FeedbackMessageProps> = ({message, personalVote, voteMessage, hideVotes}: FeedbackMessageProps) => {
+const FeedbackMessage:
+React.FC<FeedbackMessageProps>
+= ({message, personalVote, voteMessage, hideVotes}: FeedbackMessageProps) => {
     return (
         <div className="FeedbackMessage-main-div">
             <p>{message.message} </p>

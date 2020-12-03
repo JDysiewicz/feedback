@@ -1,4 +1,5 @@
 import React from "react";
+
 import { CreatorOptionsProps } from "../../types";
 
 const CreatorOptions: React.FC<CreatorOptionsProps> = (props: CreatorOptionsProps): JSX.Element => {
@@ -8,6 +9,5 @@ const CreatorOptions: React.FC<CreatorOptionsProps> = (props: CreatorOptionsProp
         </div>
     );
 };
-
 
 export default CreatorOptions;

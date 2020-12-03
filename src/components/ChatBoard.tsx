@@ -5,7 +5,6 @@ import io from "socket.io-client";
 import { downloadFeedback } from "../utils/dowloadFeedback";
 import { ChatBoardProps, Message, PersonalVotedMessage } from "types";
 import CreatorOptions from "./CreatorOptions";
-import FeedbackMessage from "./FeedbackMessage";
 import {
     socketEmitNewMessage,
     socketEmitUpvote,
@@ -15,6 +14,7 @@ import {
     socketOnVoteVis
 } from "src/utils/socketFunctions";
 import { messageValidator } from "src/utils/messageValidator";
+import FeedbackGrid from "./FeedbackGrid";
 
 // Outside main App so doesn't create a new socket on every 
 // component re-render.
@@ -71,16 +71,6 @@ React.FC<ChatBoardProps>
         
     };
 
-    const renderList = () : JSX.Element[] => {
-        return messageList.map((message: Message) => {
-            const indexOfVoted = votedMessages.findIndex(msg => msg.messageId === message.id);
-            const personalVote = indexOfVoted === -1 ? 0 : votedMessages[indexOfVoted].personalVotes;
-            return (
-                <FeedbackMessage key={message.id} hideVotes={hideVotes} voteMessage={voteMessage} message={message} personalVote={personalVote} />
-            );
-        });
-    };
-
     const handleClick = (): void => {
         const err: string | null = messageValidator(message);
         if (err) {
@@ -108,7 +98,7 @@ React.FC<ChatBoardProps>
             </div>
             <div className="ChatBoard-feedback-list">
                 <div className="ChatBoard-feedback-grid">
-                    {renderList()}
+                    <FeedbackGrid messageList={messageList} votedMessages={votedMessages} hideVotes={hideVotes} voteMessage={voteMessage} />
                 </div>
             </div>
             <div className="ChatBoard-write-message">

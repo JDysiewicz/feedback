@@ -51,6 +51,13 @@ export interface FeedbackMessageProps {
     hideVotes: boolean;
 }
 
+export interface FeedbackGridProps {
+    messageList: Message[];
+    votedMessages: PersonalVotedMessage[];
+    hideVotes: boolean;
+    voteMessage: (message: Message, value: number) => void;
+}
+
 // React Router locationState for SplashScreen component
 export interface SplashScreenLocationState{
     message: string;

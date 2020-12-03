@@ -19,12 +19,6 @@ export interface BoardMessageListObject {
     [key: string]: BoardMessageList
 };
 
-// React Router LocationState for the ChatBoard component
-export interface ChatBoardLocationState {
-    roomCreator: boolean;
-    fromRedirect?: boolean;
-}
-
 // Used to keep track of which messages an individual has voted for client-side
 export interface PersonalVotedMessage {
     messageId: string;
@@ -35,7 +29,6 @@ export interface PersonalVotedMessage {
 export interface CreatorOptionsProps {
     socket: SocketIOClient.Socket;
     boardId: string;
-    toggleHideVotes: () => void;
 }
 
 // Props for the NewRoom component
@@ -44,10 +37,32 @@ export interface NewRoomProps{
     roomCreator: boolean;
 }
 
+// Props for ChatBoard
+export interface ChatBoardProps {
+    boardId: string;
+    didCreate: boolean
+}
+
+// Props passed to FeedbackMessage
+export interface FeedbackMessageProps {
+    message: Message;
+    personalVote: number;
+    voteMessage: (message: Message, value: number) => void;
+    hideVotes: boolean;
+}
+
 // React Router locationState for SplashScreen component
 export interface SplashScreenLocationState{
     message: string;
 }
+
+// The props passed into RouteValidator via React Router
+export interface RouteValidatorLocationState {
+    roomCreator: boolean;
+    boardId: string;
+    fromRedirect?: boolean;
+};
+
 
 // The query sent to the backend when registering a new board
 export interface SocketQuery{
@@ -57,9 +72,3 @@ export interface SocketQuery{
     board?: string;
 }
 
-export interface FeedbackMessageProps {
-    message: Message;
-    personalVote: number;
-    voteMessage: (message: Message, value: number) => void;
-    hideVotes: boolean;
-}

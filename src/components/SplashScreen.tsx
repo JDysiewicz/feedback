@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { StaticContext } from "react-router";
 import { Redirect, RouteComponentProps } from "react-router-dom";
-import { NewRoomProps, SplashScreenLocationState } from "../../types";
+
+import { NewRoomProps, SplashScreenLocationState } from "types";
 import { isAxiosError } from "src/utils/isAxiosError";
 
 // eslint disable here as RouteComponentProps needs an 'any' as first argument
@@ -22,10 +23,20 @@ React.FC<RouteComponentProps<any, StaticContext, SplashScreenLocationState>>
 
     // Right now, no checking for if roomId exists - just relying on that 1/million chance of two rooms simultaneously
     // existing - Add in a check
-    const createRoom = () => {
-        const newRoomId = (Math.random()*1000000).toString().split(".")[0];
-        const newRoomProps: NewRoomProps = {search: `?board=${newRoomId}`, roomCreator: true };
-        setRedirect(newRoomProps);
+    const createRoom = async () => {
+        try {
+            // Makes sure not to duplicate rooms if 1/1,000,000 chance happens
+            const { data } = await axios.get("/api/current-rooms");
+            let newRoomId = (Math.random()*1000000).toString().split(".")[0];
+            while (data.indexOf(newRoomId) !== -1){
+                newRoomId = (Math.random()*1000000).toString().split(".")[0];
+            }
+
+            const newRoomProps: NewRoomProps = {search: `?board=${newRoomId}`, roomCreator: true };
+            setRedirect(newRoomProps);
+        } catch (err: unknown) {
+            console.log(err);
+        }
     };
 
     const joinRoom = async () => {

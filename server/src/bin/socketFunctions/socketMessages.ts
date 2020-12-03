@@ -9,7 +9,7 @@ import { Message } from "../../../../types";
 
 export const socketMessages = (socket: Socket, io: SocketIO.Server, boardId: string) => {
     // When new socket joins, give them the current messageList
-    socket.emit("initial-vote-visibility", boardMessageLists[boardId].hideVotes);
+    socket.emit("toggle-votes", boardMessageLists[boardId].hideVotes);
     socket.emit("message", boardMessageLists[boardId].messages);
     
     // Controls the voting

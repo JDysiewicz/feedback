@@ -1,6 +1,6 @@
 import React from "react";
 
-import { FeedbackMessageProps } from "../../types";
+import { FeedbackMessageProps } from "types";
 
 const FeedbackMessage:
 React.FC<FeedbackMessageProps>

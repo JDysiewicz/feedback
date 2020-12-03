@@ -6,14 +6,9 @@ import { RouteComponentProps, StaticContext } from "react-router";
 import { isAxiosError } from "src/utils/isAxiosError";
 import ChatBoard from "./ChatBoard";
 import Error404Page from "./Error404Page";
+import { RouteValidatorLocationState } from "types";
 
-
-interface RouteValidatorLocationState {
-    roomCreator: boolean;
-    boardId: string;
-    fromRedirect?: boolean;
-}
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const RouteValidator:
 React.FC<RouteComponentProps<any, StaticContext, RouteValidatorLocationState>>
 = (props: RouteComponentProps<any, StaticContext, RouteValidatorLocationState>): JSX.Element => {
@@ -24,10 +19,10 @@ React.FC<RouteComponentProps<any, StaticContext, RouteValidatorLocationState>>
     useEffect(() => {
         const asyncUseEffect = async () => {
             const queryParam = props.location.search;
-            console.log(queryParam);
+            const regexToCheckBoard = /^\?board=[0-9]*$/; // checks for '?board=123...32' as the query param
 
             // RegEx to match for the boardId in the search query - if doesnt match then will render 404 page
-            if (!/^\?board=[0-9]*$/.test(queryParam)) {
+            if (!regexToCheckBoard.test(queryParam)) {
                 setRenderChatBoard(false);
                 return;
             }
@@ -80,7 +75,7 @@ React.FC<RouteComponentProps<any, StaticContext, RouteValidatorLocationState>>
 
     if (renderChatBoard === null) return <div></div>; // Return loading spinner in future
     else if (renderChatBoard === false) return <Error404Page />; // Error 404 page with link to home
-    else return <ChatBoard {...redirectProps} />;
+    else return <ChatBoard {...redirectProps} />; // All good, render ChatBoard, passing in props
 };
 
 export default RouteValidator;

@@ -3,29 +3,31 @@ import { Redirect } from "react-router";
 import io from "socket.io-client";
 
 import { downloadFeedback } from "../utils/dowloadFeedback";
-import { Message, PersonalVotedMessage } from "../../types";
+import { ChatBoardProps, Message, PersonalVotedMessage } from "types";
 import CreatorOptions from "./CreatorOptions";
 import FeedbackMessage from "./FeedbackMessage";
+import {
+    socketEmitNewMessage,
+    socketEmitUpvote,
+    socketOnCreatorDC,
+    socketOnError,
+    socketOnMessageList,
+    socketOnVoteVis
+} from "src/utils/socketFunctions";
+import { messageValidator } from "src/utils/messageValidator";
 
 // Outside main App so doesn't create a new socket on every 
 // component re-render.
 const ENDPOINT = process.env.NODE_ENV === "production" ?
     "https://feedback-dysiewicz.herokuapp.com" :
     "localhost:5000";
-
 const NUM_VOTES = 3;
 
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-// const ChatBoard:
-// React.FC<RouteComponentProps<any, StaticContext, ChatBoardLocationState>>
-// = (props: RouteComponentProps<any, StaticContext, ChatBoardLocationState>): JSX.Element => {
-
 const ChatBoard:
-React.FC<any>
-= (props: any): JSX.Element => {
+React.FC<ChatBoardProps>
+= ({boardId, didCreate}: ChatBoardProps): JSX.Element => {
 
-    
+    // Stateful vars
     const [messageList, setMessageList] = useState<Message[]>([]);
     const [message, setMessage] = useState<string>("");
     const [socket, setSocket] = useState<SocketIOClient.Socket>();
@@ -36,39 +38,22 @@ React.FC<any>
 
     // Set up socket connection
     useEffect(() => {
-        setSocket(io.connect(ENDPOINT, {query: `board=${props.boardId}`}));
+        setSocket(io.connect(ENDPOINT, {query: `board=${boardId}`}));
         return () => {
             if (socket) socket.disconnect();
         };
     }, []);
 
-    // Return loading spinner while socket waiting to be setup
+    // Return loading spinner if waiting on socket, or redirect if disconnected
     if (!socket) return <div></div>;
+    if (redirect) return <Redirect to={{pathname: "/", state: {message: "Disconnected due to admin inactivity"}}} />;
 
-    // Socket functions - extract
-    socket.on("message", (messageList: Message[]) => {
-        setMessageList(messageList);
-    });
-
-    socket.on("error", (errorMessage: string) => {
-        alert(`Error: ${errorMessage}`);
-    });
-
-    socket.on("initial-vote-visibility", (voteVis: boolean) => {
-        console.log("VOTE VIS", voteVis);
-        setHideVotes(voteVis);
-    });
-
-    socket.on("creator-disconnect", (message: {msg: string, timeout: number}) => {
-        setWarning(message.msg);
-        setTimeout(() => {
-            socket.close();
-            setWarning("");
-            setRedirect("/");
-        }, message.timeout);
-        return;
-    });
-
+    // Socket functions
+    socketOnMessageList(socket, setMessageList);
+    socketOnError(socket);
+    socketOnVoteVis(socket, setHideVotes);
+    socketOnCreatorDC(socket, setWarning, setRedirect);
+    
     const voteMessage = (message: Message, value: number) => {
         const indexOfVoted = votedMessages.findIndex(msg => msg.messageId === message.id);
         // If not in votedMessages array, add it to it and give it a personal vote of +1/-1
@@ -82,7 +67,8 @@ React.FC<any>
             const newVotedMessageArray = votedMessages.filter(msg => msg.messageId !== message.id);
             setVotedMessages([...newVotedMessageArray, newVotedMessage]);
         }
-        socket.emit("upvote", {message, value});
+        socketEmitUpvote(socket, message, value);
+        
     };
 
     const renderList = () : JSX.Element[] => {
@@ -95,25 +81,15 @@ React.FC<any>
         });
     };
 
-    const toggleHideVotes = () => {
-        socket.emit("toggle-votes");
-    };
-
-    socket.on("toggle-votes", () => {
-        setHideVotes(!hideVotes);
-    });
-
     const handleClick = (): void => {
-        if (message.length === 0) return alert("Message cannot be empty");
-        if (message.includes("\n")) return alert("New line characters are not permitted");
-        const user: string = socket.id;
-        const newMessage = {user, message, upvotes: 0};
-        socket.emit("message", newMessage);
+        const err: string | null = messageValidator(message);
+        if (err) {
+            alert(err);
+            return;
+        }
+        socketEmitNewMessage(socket, message);
         setMessage("");
-        return; 
     };
-
-    if (redirect) return <Redirect to={{pathname: "/", state: {message: "Disconnected due to admin inactivity"}}} />;
 
     return(
         <div className="ChatBoard-main-div">
@@ -121,11 +97,11 @@ React.FC<any>
                 <div className="ChatBoard-info">
                     <div>
                         <h1>Anonymous Feedback</h1>
-                        <h3>RoomID: {props.boardId}</h3>
+                        <h3>RoomID: {boardId}</h3>
                     </div>
                 </div>
                 <div className="ChatBoard-temp">
-                    {props.didCreate && <CreatorOptions socket={socket} boardId={props.boardId} toggleHideVotes={toggleHideVotes}/>}
+                    {didCreate && <CreatorOptions socket={socket} boardId={boardId}/>}
                 </div>
                 <button className="ChatBoard-download" onClick={() => downloadFeedback(messageList)}>Download Feedback</button>
                 {warning && <h3 style={{color: "red"}}>{warning}</h3>}
@@ -135,11 +111,9 @@ React.FC<any>
                     {renderList()}
                 </div>
             </div>
-            
             <div className="ChatBoard-write-message">
                 <label htmlFor="write-message">Write a Message: </label>
-                <textarea id="write-message" name="write-message" value={message} placeholder="Write a message" onChange={(e) => setMessage(e.target.value)} />
-                
+                <textarea id="write-message" name="write-message" value={message} onChange={(e) => setMessage(e.target.value)} />
                 <button id="submit-message" name="submit-message" onClick={() => handleClick()}>Submit Message</button>
             </div>
         </div>

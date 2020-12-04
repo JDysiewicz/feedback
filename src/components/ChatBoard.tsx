@@ -38,24 +38,26 @@ React.FC<ChatBoardProps>
 
     // Set up socket connection and listeners
     useEffect(() => {
-        setSocket(io.connect(ENDPOINT, {query: `board=${boardId}`}));
+        if (!socket){
+            setSocket(io.connect(ENDPOINT, {query: `board=${boardId}`}));
+        } else {
+            socketOnVoteVis(socket, setHideVotes);
+            socketOnMessageList(socket, setMessageList);
+            socketOnError(socket);
+            socketOnCreatorDC(socket, setWarning, setRedirect);
+        }
+        
         return () => {
             if (socket) socket.disconnect();
         };
-    }, []);
-
-    useEffect(() => {
-        if (!socket) return;
-        socketOnVoteVis(socket, setHideVotes);
-        socketOnMessageList(socket, setMessageList);
-        socketOnError(socket);
-        socketOnCreatorDC(socket, setWarning, setRedirect);
     }, [socket]);
 
     // Return loading spinner if waiting on socket, or redirect if disconnected
     if (!socket) return <div></div>;
     if (redirect) return <Redirect to={{pathname: "/", state: {message: "Disconnected due to admin inactivity"}}} />;
     
+    // Could factor this out, but needs access to many vars/methods described here. Would have to pass them all in
+    // feels like if I have to pass in like 7 arguments then maybe it should stay here?
     const voteMessage = (message: Message, value: number) => {
         const indexOfVoted = votedMessages.findIndex(msg => msg.messageId === message.id);
         // If not in votedMessages array, add it to it and give it a personal vote of +1/-1
@@ -70,7 +72,6 @@ React.FC<ChatBoardProps>
             setVotedMessages([...newVotedMessageArray, newVotedMessage]);
         }
         socketEmitUpvote(socket, message, value);
-        
     };
 
     const handleClick = (): void => {
@@ -88,8 +89,7 @@ React.FC<ChatBoardProps>
             <div className="ChatBoard-header-content">
                 <div className="ChatBoard-info">
                     <div>
-                        <h1>Anonymous Feedback</h1>
-                        <h3>RoomID: {boardId}</h3>
+                        <h1>Anonymous Feedback: RoomID - {boardId}</h1>
                     </div>
                 </div>
                 <div className="ChatBoard-temp">
@@ -104,7 +104,7 @@ React.FC<ChatBoardProps>
                 </div>
             </div>
             <div className="ChatBoard-write-message">
-                <label htmlFor="write-message">Write a Message: </label>
+                <label htmlFor="write-message">Write a Message: <small>{message.length}/150</small></label>
                 <textarea id="write-message" name="write-message" value={message} onChange={(e) => setMessage(e.target.value)} />
                 <button id="submit-message" name="submit-message" onClick={() => handleClick()}>Submit Message</button>
             </div>

@@ -17,6 +17,8 @@ React.FC<RouteComponentProps<any, StaticContext, RouteValidatorLocationState>>
     const [redirectProps, setRedirectProps] = useState<{boardId: string, didCreate: boolean}>({boardId: "", didCreate: false});
 
     useEffect(() => {
+
+        // No async useEffect yet so have to define function inside and then run it.
         const asyncUseEffect = async () => {
             const queryParam = props.location.search;
             const regexToCheckBoard = /^\?board=[0-9]*$/; // checks for '?board=123...32' as the query param
@@ -30,7 +32,7 @@ React.FC<RouteComponentProps<any, StaticContext, RouteValidatorLocationState>>
             // Will have a .board if this passes
             const boardId = qs.parse(props.location.search).board as string;
 
-            // If here from a redirect, then set props for ChatBoard 
+            // If here from a redirect, then set props for ChatBoard - all good. 
             if (props.location.state){
                 setRedirectProps({boardId, didCreate: props.location.state.roomCreator});
                 setRenderChatBoard(true);
@@ -45,14 +47,19 @@ React.FC<RouteComponentProps<any, StaticContext, RouteValidatorLocationState>>
             } catch (err: unknown) {
                 if (isAxiosError(err)) {
                     if (err.response?.status === 400){
+                        // No room exists by that ID
                         alert(err.response.data.message + ` (${boardId})`);
                         
                     } else {
+                        // Catch-all
                         alert("Something went wrong.");
                     }
                 } else {
+                    // Catch-all
                     alert("Something went wrong.");
                 }
+
+                // If catching an error at all, don't display the ChatBoard.
                 setRenderChatBoard(false);
                 return;
             }
@@ -63,7 +70,7 @@ React.FC<RouteComponentProps<any, StaticContext, RouteValidatorLocationState>>
                 return;
             }
             
-            // If all checks out, they must be attempting to join a room.
+            // If all checks out, they must be attempting to join a room that exists
             setRedirectProps({boardId, didCreate: false});
             setRenderChatBoard(true);
         };

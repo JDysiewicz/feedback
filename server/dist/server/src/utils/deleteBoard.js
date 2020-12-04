@@ -8,7 +8,7 @@ exports.deleteBoard = (boardId, io) => {
         msg: "Room creator has disconnected; room will automatically close in 5 minutes. Please download any feedback you wish to keep, as this will be deleted when the room closes",
         timeout: TIMEOUT
     });
-    setTimeout((boardId) => {
+    setTimeout(() => {
         delete boardMessageLists_1.boardMessageLists[boardId];
     }, TIMEOUT);
     return;

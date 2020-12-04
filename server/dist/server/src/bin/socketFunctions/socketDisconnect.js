@@ -6,8 +6,10 @@ const deleteBoard_1 = require("../../utils/deleteBoard");
 exports.socketDisconnect = (socket, io, boardId) => {
     socket.on("disconnect", () => {
         console.log("user disconnected: ", socket.id);
-        if (boardMessageLists_1.boardMessageLists[boardId].creator === socket.id) {
-            deleteBoard_1.deleteBoard(boardId, io);
+        if (boardMessageLists_1.boardMessageLists[boardId] !== undefined) {
+            if (boardMessageLists_1.boardMessageLists[boardId].creator === socket.id) {
+                deleteBoard_1.deleteBoard(boardId, io);
+            }
         }
     });
 };

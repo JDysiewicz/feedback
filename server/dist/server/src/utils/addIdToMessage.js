@@ -12,11 +12,16 @@ const generateId = () => {
     return id;
 };
 exports.addIdToMessage = (newMessage, boardId) => {
-    const currentIds = boardMessageLists_1.boardMessageLists[boardId].messages.map(message => message.id);
-    let id = generateId();
-    while (currentIds.indexOf(id) !== -1)
-        id = generateId();
-    const generatedNewMessage = Object.assign(Object.assign({}, newMessage), { id });
-    return generatedNewMessage;
+    try {
+        const currentIds = boardMessageLists_1.boardMessageLists[boardId].messages.map(message => message.id);
+        let id = generateId();
+        while (currentIds.indexOf(id) !== -1)
+            id = generateId();
+        const generatedNewMessage = Object.assign(Object.assign({}, newMessage), { id });
+        return generatedNewMessage;
+    }
+    catch (err) {
+        return new Error(err);
+    }
 };
 //# sourceMappingURL=addIdToMessage.js.map

@@ -16,5 +16,9 @@ router.get("/valid-room", (req, res, next) => {
         return next(apiError_1.default.badRequest({ error: "BoardId does not exist", message: "No currently active board by that ID" }));
     res.status(200).send(true);
 });
+router.get("/current-rooms", (req, res, next) => {
+    const roomArr = Object.keys(boardMessageLists_1.boardMessageLists);
+    res.send(roomArr);
+});
 exports.default = router;
 //# sourceMappingURL=apiRouter.js.map

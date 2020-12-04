@@ -20,10 +20,10 @@ export const socketMessages = (socket: Socket, io: SocketIO.Server, boardId: str
     });
 
     socket.on("toggle-votes", () => {
-        boardMessageLists[boardId].hideVotes = !boardMessageLists[boardId].hideVotes
+        boardMessageLists[boardId].hideVotes = !boardMessageLists[boardId].hideVotes;
         console.log("In the board id");
         // MAKES IT INTO HERE - ISSUE WITH RECIEVING THE EMIT
-        io.to(boardId).emit("toggle-votes");
+        io.to(boardId).emit("toggle-votes", boardMessageLists[boardId].hideVotes);
     });
     
     // Update messageList with newMessage and send the update to everyone

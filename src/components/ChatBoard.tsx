@@ -33,10 +33,12 @@ React.FC<ChatBoardProps>
     const [socket, setSocket] = useState<SocketIOClient.Socket>();
     const [redirect, setRedirect] = useState<string>("");
     const [warning, setWarning] = useState<string>();
-    const [hideVotes, setHideVotes] = useState<boolean>(true);
+    const [hideVotes, setHideVotes] = useState<boolean>(true); // Note: When a user joins, the 'socketOnVoteVis' function runs which reverses the current vote vis.
+    // This means that whatever this is initially set to, will instantly get reversed. Hence why this is initialised to be 'false'
+    // meaning that it will become 'true' when users first join. This is an issue with refactoring out the socket functions into a separate file.
     const [votedMessages, setVotedMessages] = useState<PersonalVotedMessage[]>([]);
 
-    // Set up socket connection
+    // Set up socket connection and listeners
     useEffect(() => {
         setSocket(io.connect(ENDPOINT, {query: `board=${boardId}`}));
         return () => {
@@ -44,15 +46,17 @@ React.FC<ChatBoardProps>
         };
     }, []);
 
+    useEffect(() => {
+        if (!socket) return;
+        socketOnVoteVis(socket, setHideVotes);
+        socketOnMessageList(socket, setMessageList);
+        socketOnError(socket);
+        socketOnCreatorDC(socket, setWarning, setRedirect);
+    }, [socket]);
+
     // Return loading spinner if waiting on socket, or redirect if disconnected
     if (!socket) return <div></div>;
     if (redirect) return <Redirect to={{pathname: "/", state: {message: "Disconnected due to admin inactivity"}}} />;
-
-    // Socket functions
-    socketOnMessageList(socket, setMessageList);
-    socketOnError(socket);
-    socketOnVoteVis(socket, setHideVotes, hideVotes);
-    socketOnCreatorDC(socket, setWarning, setRedirect);
     
     const voteMessage = (message: Message, value: number) => {
         const indexOfVoted = votedMessages.findIndex(msg => msg.messageId === message.id);
@@ -91,7 +95,7 @@ React.FC<ChatBoardProps>
                     </div>
                 </div>
                 <div className="ChatBoard-temp">
-                    {didCreate && <CreatorOptions socket={socket} boardId={boardId}/>}
+                    {didCreate && <CreatorOptions socket={socket} boardId={boardId} />}
                 </div>
                 <button className="ChatBoard-download" onClick={() => downloadFeedback(messageList)}>Download Feedback</button>
                 {warning && <h3 style={{color: "red"}}>{warning}</h3>}

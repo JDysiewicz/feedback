@@ -33,9 +33,7 @@ React.FC<ChatBoardProps>
     const [socket, setSocket] = useState<SocketIOClient.Socket>();
     const [redirect, setRedirect] = useState<string>("");
     const [warning, setWarning] = useState<string>();
-    const [hideVotes, setHideVotes] = useState<boolean>(true); // Note: When a user joins, the 'socketOnVoteVis' function runs which reverses the current vote vis.
-    // This means that whatever this is initially set to, will instantly get reversed. Hence why this is initialised to be 'false'
-    // meaning that it will become 'true' when users first join. This is an issue with refactoring out the socket functions into a separate file.
+    const [hideVotes, setHideVotes] = useState<boolean>(true);
     const [votedMessages, setVotedMessages] = useState<PersonalVotedMessage[]>([]);
 
     // Set up socket connection and listeners

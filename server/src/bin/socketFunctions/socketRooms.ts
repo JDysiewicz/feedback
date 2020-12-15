@@ -1,9 +1,11 @@
 import { Socket } from "socket.io";
 import { Message, BoardMessageList } from "../../../../types";
 import { boardMessageLists } from "../../utils/boardMessageLists";
+import mongoose from "mongoose";
+const Board = mongoose.model("boards");
 
 
-export const socketRooms = (socket: Socket, io: SocketIO.Server, boardId: string) => {
+export const socketRooms = async (socket: Socket, io: SocketIO.Server, boardId: string) => {
 
     // Join the room which socket id matches
 
@@ -13,6 +15,7 @@ export const socketRooms = (socket: Socket, io: SocketIO.Server, boardId: string
     if (!boardMessageLists[boardId]) {
         const newBoardMessageList: BoardMessageList = {creator: socket.id, boardId: boardId, messages: [] as Message[], hideVotes: true};
         boardMessageLists[boardId] = newBoardMessageList;
+        await new Board(newBoardMessageList).save();
     }
 };
 

@@ -8,7 +8,7 @@ import { SocketQuery } from "../../../../types";
 // Wrapper for all socketFunctions via io.on("Connection")
 export const socketSetup = (io: SocketIO.Server) => {
     io.on("connection", (socket: Socket) => {
-        console.log(`User connected! ${socket.id}`)
+        console.log(`User connected! ${socket.id}`);
         const socketQueries: SocketQuery = socket.handshake.query;
         if (socketQueries.board === undefined) return;
         const boardId: string = socketQueries.board;

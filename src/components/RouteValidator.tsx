@@ -7,6 +7,8 @@ import { isAxiosError } from "src/utils/isAxiosError";
 import ChatBoard from "./ChatBoard";
 import Error404Page from "./Error404Page";
 import { RouteValidatorLocationState } from "types";
+import { validateQueryParams } from "src/utils/validateQueryParams";
+
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const RouteValidator:
@@ -20,11 +22,8 @@ React.FC<RouteComponentProps<any, StaticContext, RouteValidatorLocationState>>
 
         // No async useEffect yet so have to define function inside and then run it.
         const asyncUseEffect = async () => {
-            const queryParam = props.location.search;
-            const regexToCheckBoard = /^\?board=[0-9]*$/; // checks for '?board=123...32' as the query param
-
-            // RegEx to match for the boardId in the search query - if doesnt match then will render 404 page
-            if (!regexToCheckBoard.test(queryParam)) {
+            const validQueryParams = validateQueryParams(props.location.search);
+            if (!validQueryParams) {
                 setRenderChatBoard(false);
                 return;
             }

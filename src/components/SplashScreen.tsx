@@ -5,6 +5,7 @@ import { Redirect, RouteComponentProps } from "react-router-dom";
 
 import { NewRoomProps, SplashScreenLocationState } from "types";
 import { isAxiosError } from "src/utils/isAxiosError";
+import { generateNewRoomProps } from "src/utils/generateNewRoomsProps";
 
 // eslint disable here as RouteComponentProps needs an 'any' as first argument
 
@@ -15,24 +16,20 @@ React.FC<RouteComponentProps<any, StaticContext, SplashScreenLocationState>>
     const [roomId, setRoomId] = useState<string>("");
     const [redirect, setRedirect] = useState<NewRoomProps>();
 
+    // If redirected here and have a message to be displayed e.g when room closes will be redirected here with a message in the
+    // props.location.state
     useEffect(() => {
         if (props.location.state !== undefined){
             alert(props.location.state.message);
         }
     }, []);
 
-    // Right now, no checking for if roomId exists - just relying on that 1/million chance of two rooms simultaneously
-    // existing - Add in a check
+
     const createRoom = async () => {
         try {
             // Makes sure not to duplicate rooms if 1/1,000,000 chance happens
-            const { data } = await axios.get("/api/current-rooms");
-            let newRoomId = (Math.random()*1000000).toString().split(".")[0];
-            while (data.indexOf(newRoomId) !== -1){
-                newRoomId = (Math.random()*1000000).toString().split(".")[0];
-            }
-
-            const newRoomProps: NewRoomProps = {search: `?board=${newRoomId}`, roomCreator: true };
+            const { data: currentRooms } = await axios.get("/api/current-rooms");
+            const newRoomProps = generateNewRoomProps(currentRooms as string[]);
             setRedirect(newRoomProps);
         } catch (err: unknown) {
             console.log(err);
@@ -45,9 +42,8 @@ React.FC<RouteComponentProps<any, StaticContext, SplashScreenLocationState>>
             return;
         }
         try {
-            const existingRoom = await axios.get("/api/valid-room", {params: {boardId: roomId}});
-            if (!existingRoom) return console.log("No room by that name!");
-            // Check whether rooms exists via express route and axios later
+            // Will error if not valid room (axios will return error 400 which counts as error)
+            await axios.get("/api/valid-room", {params: {boardId: roomId}});
             setRedirect({search: `?board=${roomId}`, roomCreator: false});
 
         } catch (err: unknown) {
@@ -63,7 +59,6 @@ React.FC<RouteComponentProps<any, StaticContext, SplashScreenLocationState>>
             }
             setRoomId("");
         }
-        return;
     };
 
     // Redirects to the feedback board passing in the appropriate props to props.location.state

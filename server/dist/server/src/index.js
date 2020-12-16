@@ -37,7 +37,7 @@ try {
 catch (err) {
     console.log("--UNABLE TO CONNECT TO DB--");
 }
-require("./database/models/boards.ts");
+require("./database/models/boards");
 const apiRouter_1 = __importDefault(require("./bin/routes/apiRouter"));
 const errorHandler_1 = __importDefault(require("./errors/errorHandler"));
 app.use(function (req, res, next) {

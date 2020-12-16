@@ -17,7 +17,7 @@ try {
     console.log("--UNABLE TO CONNECT TO DB--");
 }
 
-require("./database/models/boards.ts");
+require("./database/models/boards");
 
 // Route Handlers
 import apiRouter from "./bin/routes/apiRouter";

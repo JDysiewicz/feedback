@@ -11,6 +11,6 @@ export const deleteBoard = (boardId: string, io: SocketIO.Server): void => {
 
     setTimeout(async () => {
         // Delete the message list from that room
-        await Board.deleteOne({boardId: boardId});
+        await Board.remove({boardId: boardId});
     }, TIMEOUT);
 };

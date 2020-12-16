@@ -8,11 +8,9 @@ const errorHandler = (err, req, res, next) => {
     console.error(err);
     if (err instanceof apiError_1.default) {
         res.status(err.code).send({ success: false, err: err.error, message: err.message });
-        return;
     }
     else {
         res.status(500).send({ success: false, err: "Internal server error", message: "Something went wrong" });
-        return;
     }
 };
 exports.default = errorHandler;

@@ -1,5 +1,15 @@
 import { Message } from "../../../types";
-import { boardMessageLists } from "./boardMessageLists";
+import mongoose from "mongoose";
+
+const Board = mongoose.model("boards");
+interface MongoFeedbackBoard {
+    _id: string;
+    creator: string;
+    boardId: string;
+    messages: Message[];
+    hideVotes: boolean;
+    __v: number;
+}
 
 const generateId = () => {
     let id = "";
@@ -11,10 +21,11 @@ const generateId = () => {
     return id;
 };
 
-export const addIdToMessage = (newMessage: {user: string, message: string, upvotes: number}, boardId: string): Message | Error => {
+export const addIdToMessage = async (newMessage: {user: string, message: string, upvotes: number}, boardId: string): Promise<Message | Error> => {
     // Generated random 8 length string of number/letters
     try {
-        const currentIds = boardMessageLists[boardId].messages.map(message => message.id);
+        const existingBoard: MongoFeedbackBoard = (await Board.findOne({boardId: boardId}) as unknown) as MongoFeedbackBoard;
+        const currentIds = existingBoard.messages.map(message => message.id);
 
         // Generate an ID that isn't already in use
         let id = generateId();
@@ -23,7 +34,7 @@ export const addIdToMessage = (newMessage: {user: string, message: string, upvot
         const generatedNewMessage: Message = {...newMessage, id};
         return generatedNewMessage;
     } catch (err: unknown){
-        return new Error(err as string)
+        return new Error(err as string);
     }
 
 };

@@ -1,24 +1,23 @@
 import React from "react";
+import { personalVoteBackground } from "src/utils/personalVoteBackground";
 
-import { Message } from "../../types";
+import { FeedbackMessageProps } from "types";
 
-interface FeedbackMessageProps {
-    message: Message;
-    personalVote: number;
-    voteMessage: (message: Message, value: number) => void;
-    hideVotes: boolean;
-}
-
-const FeedbackMessage: React.FC<FeedbackMessageProps> = ({message, personalVote, voteMessage, hideVotes}: FeedbackMessageProps) => {
+const FeedbackMessage:
+React.FC<FeedbackMessageProps>
+= ({message, personalVote, voteMessage, hideVotes}: FeedbackMessageProps) => {
     return (
         <div className="FeedbackMessage-main-div">
-            <p>{message.message} </p>
-            <div className="FeedbackMessage-voting-buttons">
-                <button style={{backgroundColor: "green"}} onClick={() => voteMessage(message, 1)}>Upvote</button>
-                <button onClick={() => voteMessage(message, -1)}>Downvote</button>
+            <div className={`FeedbackMessage-personal-vote ${personalVoteBackground(personalVote)}`}>
+                <strong>{personalVote}</strong>
             </div>
-            <div className="FeedbackMessage-votes">
-                <p>Personal Vote: {personalVote} </p>
+
+            <div className="FeedbackMessage-info">
+                <div style={{alignSelf: "flex-end"}}>
+                    <button className="FeedbackMessage-downvote-button" onClick={() => voteMessage(message, -1)}></button>
+                    <button className="FeedbackMessage-upvote-button"  onClick={() => voteMessage(message, 1)}></button>
+                </div>
+                <p>{message.message} </p>
                 <p> <strong>Total Votes: {!hideVotes ? message.upvotes : <i style={{color: "grey"}}>hidden by room owner</i>} </strong></p>
             </div>
         </div>

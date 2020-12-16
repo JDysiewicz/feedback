@@ -9,6 +9,7 @@
       "esnext.asynciterable"
     ],
     "sourceMap": true,
+    "strict": true,
     "outDir": "dist",
     "moduleResolution": "node",
     "removeComments": true,
@@ -28,7 +29,8 @@
     "baseUrl": "."
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "server/dist"
   ],
   "include": [
     "./src/**/*.tsx",

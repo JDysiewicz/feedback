@@ -1,7 +1,24 @@
-import { Message } from "../../../types";
-import { boardMessageLists } from "./boardMessageLists";
+import { Message, MongoFeedbackBoard } from "../../../types";
+import mongoose from "mongoose";
 
-const generateId = () => {
+const Board = mongoose.model("boards");
+
+export const addIdToMessage = async (newMessage: {user: string, message: string, upvotes: number}, boardId: string): Promise<Message | Error> => {
+    try {
+        const existingBoard: MongoFeedbackBoard = (await Board.findOne({boardId: boardId}) as unknown) as MongoFeedbackBoard;
+        const currentIds = existingBoard.messages.map(message => message.id);
+
+        let id = generateRandomId();
+        while (currentIds.indexOf(id) !== -1) id = generateRandomId();
+    
+        const generatedNewMessage: Message = {...newMessage, id};
+        return generatedNewMessage;
+    } catch (err: unknown){
+        return new Error(err as string);
+    }
+};
+
+const generateRandomId = () => {
     let id = "";
     const CHARSET = "abcdefghijklmnopqrstuvwxyz0123456789";
     const ID_LENGTH = 8; 
@@ -9,21 +26,4 @@ const generateId = () => {
         id += CHARSET.charAt(Math.floor(Math.random() * CHARSET.length));
     }
     return id;
-};
-
-export const addIdToMessage = (newMessage: {user: string, message: string, upvotes: number}, boardId: string): Message | Error => {
-    // Generated random 8 length string of number/letters
-    try {
-        const currentIds = boardMessageLists[boardId].messages.map(message => message.id);
-
-        // Generate an ID that isn't already in use
-        let id = generateId();
-        while (currentIds.indexOf(id) !== -1) id = generateId();
-    
-        const generatedNewMessage: Message = {...newMessage, id};
-        return generatedNewMessage;
-    } catch (err: unknown){
-        return new Error(err as string)
-    }
-
 };

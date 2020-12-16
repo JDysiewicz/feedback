@@ -1,13 +1,19 @@
 import React from "react";
-import { CreatorOptionsProps } from "../../types";
+import { socketEmitVoteVis } from "src/utils/socketFunctions";
+
+import { CreatorOptionsProps } from "types";
 
 const CreatorOptions: React.FC<CreatorOptionsProps> = (props: CreatorOptionsProps): JSX.Element => {
+    
+    const toggleHideVotes = () => {
+        socketEmitVoteVis(props.socket);
+    };
+
     return (
         <div>
-            <button onClick={() => props.toggleHideVotes()}>Toggle Vote Visibility</button>
+            <button onClick={() => toggleHideVotes()}>Toggle Vote Visibility</button>
         </div>
     );
 };
-
 
 export default CreatorOptions;

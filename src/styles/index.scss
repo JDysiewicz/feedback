@@ -4,6 +4,9 @@ $main-brown: #dc978a;
 $main-pale: #ffe5db;
 $main-blue: #57babb;
 
+$agree: #03Ac13;
+$disagree: #D21404;
+
 
 
 html {
@@ -56,7 +59,7 @@ html {
         align-self: center;
         display: flex;
         width: 95%;
-        justify-content: space-around;
+        justify-content: space-between;
         align-items: center;
     }
 
@@ -73,7 +76,7 @@ html {
 
     & .ChatBoard-download {
         background-color: $main-red;
-        width: 50%;
+        width: 5rem;
         align-self: center;
     }
 
@@ -113,7 +116,7 @@ html {
         border-radius: 10px;
         width: 95%;
         text-align: center;
-        height: 50vh;
+        height: 54vh;
         overflow-y: scroll;
         overflow-x: hidden;
         word-wrap: break-word;
@@ -122,23 +125,58 @@ html {
 
     & .ChatBoard-feedback-grid{
         display: grid;
-        grid-template-columns: 50% 50%;
-        grid-template-rows: repeat(20%, auto);
+        grid-template-columns: 33% 33% 33%;
+        grid-auto-rows: minmax(min-content, max-content);
     }
 }
 
-.FeedbackMessage-main-div {
-    background-color: $main-pale;
-    color: black;
+.FeedbackMessage-main-div{
+    display: grid;
+    grid-template-columns: 10% 90%;
     font-weight: 500;
     border-radius: 10px;
-    font-size: 20px;
+    font-size: 1.2rem;
+    margin: 10px;
+    border: 2px solid black;
+    min-height: 11rem;
+}
+
+.FeedbackMessage-personal-vote{
+    min-height: 11rem;
+    font-size: 1.5rem;
     display: flex;
     flex-direction: column;
-    margin: 10px;
+    grid-row: 1;
+    grid-column: 1/2;
+    border-radius: 10px;
+    z-index: 8;
+    border-radius: 0px;
+    border-bottom-left-radius: 8px;
+    border-top-left-radius: 8px;
+    justify-content: center;
+    align-items: center;
+    border-right: 2px solid black;
+    background-color: $main-pale;
+
+
+    
+}
+
+.FeedbackMessage-info {
+    min-height: 11rem;
+    grid-row: 1;
+    z-index: 1;
+    border-radius: 10px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    grid-column: 2/3;
+    background-color: $main-pale;
+    color: black;
+    display: flex;
+    flex-direction: column;
 
     & p {
-        margin: 5px
+        margin: 10px
     }
 
     & button {
@@ -151,3 +189,45 @@ html {
         align-self: center;
     }
 }
+
+button.FeedbackMessage-upvote-button{
+    width: 2rem;
+    height: 2rem;
+    background-color: $agree;
+}
+
+button.FeedbackMessage-downvote-button{
+    width: 2rem;
+    height: 2rem;
+    background-color: $disagree;
+}
+
+
+
+.strong-agree {
+    background-color: $agree
+}
+
+.agree {
+    background-color: $agree
+}
+
+.partial-agree {
+    background-color: $agree
+}
+
+.partial-disagree {
+    color: white;
+    background-color: $disagree
+}
+
+.disagree {
+    color: white;
+    background-color: $disagree
+}
+
+.strong-disagree {
+    color: white;
+    background-color: $disagree
+}
+

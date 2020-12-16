@@ -11,6 +11,7 @@ exports.socketSetup = (io) => {
         if (socketQueries.board === undefined)
             return;
         const boardId = socketQueries.board;
+        console.log("Board ID: ", boardId);
         socketRooms_1.socketRooms(socket, io, boardId);
         socketMessages_1.socketMessages(socket, io, boardId);
         socketDisconnect_1.socketDisconnect(socket, io, boardId);

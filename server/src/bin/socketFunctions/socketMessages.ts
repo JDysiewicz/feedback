@@ -1,38 +1,70 @@
 import { Socket } from "socket.io";
-import { boardMessageLists } from "../../utils/boardMessageLists";
 import { addIdToMessage } from "../../utils/addIdToMessage";
-import { Message } from "../../../../types";
+import { MongoFeedbackBoard, Message } from "../../../../types";
+import mongoose from "mongoose";
+import { handleSocketError } from "../../errors/handleSocketError";
 
-// Message array that holds all messages for now
-// Separate this out and make a new array for each room probs
+const Board = mongoose.model("boards");
 
+export const socketMessages = (socket: Socket, io: SocketIO.Server, boardId: string): void => {
+    sendInitialStateOfBoard(socket, boardId);
+    socketUpvote(socket, io, boardId);
+    socketToggleVoteVis(socket, io, boardId);
+    socketMessage(socket, io, boardId);
+};
 
-export const socketMessages = (socket: Socket, io: SocketIO.Server, boardId: string) => {
-    // When new socket joins, give them the current messageList
-    socket.emit("initial-vote-visibility", boardMessageLists[boardId].hideVotes);
-    socket.emit("message", boardMessageLists[boardId].messages);
+const sendInitialStateOfBoard = async (socket: Socket, boardId: string) => {
+    try {
+        const existingBoard: MongoFeedbackBoard = (await Board.findOne({boardId: boardId}) as unknown) as MongoFeedbackBoard;
+        if (!existingBoard) return;
+        socket.emit("toggle-votes", existingBoard.hideVotes);
+        socket.emit("message", existingBoard.messages);
+    } catch (err: unknown){
+        handleSocketError(err, socket);
+    }
+};
+
+const socketUpvote = (socket: Socket, io: SocketIO.Server, boardId: string) => {
+    socket.on("upvote", async ({message, value}: {message: Message, value: number}) => {
+        try {
+            if (value > 0) await Board.updateOne({boardId: boardId, "messages.id": message.id}, {$inc: {"messages.$.upvotes": 1}});
+            if (value < 0) await Board.updateOne({boardId: boardId, "messages.id": message.id}, {$inc: {"messages.$.upvotes": -1}});
     
-    // Controls the voting
-    socket.on("upvote", ({message, value}: {message: Message, value: number}) => {
-        const idx: number = boardMessageLists[boardId].messages.findIndex(msg => msg.id === message.id);
-        boardMessageLists[boardId].messages[idx] = {...message, upvotes: message.upvotes+value};
-        io.to(boardId).emit("message", boardMessageLists[boardId].messages);
+            const existingBoard: MongoFeedbackBoard = (await Board.findOne({boardId: boardId}) as unknown) as MongoFeedbackBoard;
+            io.to(boardId).emit("message", existingBoard.messages);
+        } catch (err: unknown) {
+            handleSocketError(err, socket);
+        }
     });
+};
 
-    socket.on("toggle-votes", () => {
-        boardMessageLists[boardId].hideVotes = !boardMessageLists[boardId].hideVotes
-        io.to(boardId).emit("toggle-votes");
+const socketToggleVoteVis = (socket: Socket, io: SocketIO.Server, boardId: string) => {
+    socket.on("toggle-votes", async () => {
+        try {
+            const existingBoard: MongoFeedbackBoard = (await Board.findOne({boardId: boardId}) as unknown) as MongoFeedbackBoard;
+            const currVal = existingBoard.hideVotes;
+            await Board.updateOne({boardId: boardId}, {$set: {hideVotes: !currVal}});
+            io.to(boardId).emit("toggle-votes", !currVal);
+        } catch (err: unknown) {
+            handleSocketError(err, socket);
+        }
     });
-    
-    // Update messageList with newMessage and send the update to everyone
-    socket.on("message", (newMessage: {user: string, message: string, upvotes: number }) => {
-        const generatedNewMessage: Message | Error = addIdToMessage(newMessage, boardId);
+};
+
+const socketMessage = (socket: Socket, io: SocketIO.Server, boardId: string) => {
+    socket.on("message", async (newMessage: {user: string, message: string, upvotes: number }) => {
+        const generatedNewMessage: Message | Error = await addIdToMessage(newMessage, boardId);
         if (generatedNewMessage instanceof Error) {
             socket.emit("error", generatedNewMessage.message);
             return;
-        } else {
-            boardMessageLists[boardId].messages.push(generatedNewMessage);
-            io.to(boardId).emit("message", boardMessageLists[boardId].messages);
+        }
+        try {
+            const existingBoard: MongoFeedbackBoard = (await Board.findOne({boardId: boardId}) as unknown) as MongoFeedbackBoard;
+            const newMessageList = [...existingBoard.messages, generatedNewMessage];
+            await Board.updateOne({boardId: boardId}, {$set: {messages: newMessageList}});
+            io.to(boardId).emit("message", newMessageList);
+        } catch (err: unknown) {
+            handleSocketError(err, socket);
         }
     });
 };

@@ -15,12 +15,12 @@ class ApiError {
         this.message = message;
     }
 
-    static badRequest({error, message}: ApiErrorParams){
-        return new ApiError(400, error, message)
+    static badRequest({error, message}: ApiErrorParams): ApiError{
+        return new ApiError(400, error, message);
     }
 
-    static internalError({error, message}: ApiErrorParams){
-        return new ApiError(500, error, message)
+    static internalError({error, message}: ApiErrorParams): ApiError{
+        return new ApiError(500, error, message);
     }
 
 }

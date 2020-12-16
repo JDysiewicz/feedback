@@ -13,7 +13,7 @@ export const socketMessages = (socket: Socket, io: SocketIO.Server, boardId: str
     socketMessage(socket, io, boardId);
 };
 
-const sendInitialStateOfBoard = async (socket: Socket, boardId: string) => {
+export const sendInitialStateOfBoard = async (socket: Socket, boardId: string) => {
     try {
         const existingBoard: MongoFeedbackBoard = (await Board.findOne({boardId: boardId}) as unknown) as MongoFeedbackBoard;
         if (!existingBoard) return;
@@ -24,7 +24,7 @@ const sendInitialStateOfBoard = async (socket: Socket, boardId: string) => {
     }
 };
 
-const socketUpvote = (socket: Socket, io: SocketIO.Server, boardId: string) => {
+export const socketUpvote = (socket: Socket, io: SocketIO.Server, boardId: string) => {
     socket.on("upvote", async ({message, value}: {message: Message, value: number}) => {
         try {
             if (value > 0) await Board.updateOne({boardId: boardId, "messages.id": message.id}, {$inc: {"messages.$.upvotes": 1}});
@@ -38,7 +38,7 @@ const socketUpvote = (socket: Socket, io: SocketIO.Server, boardId: string) => {
     });
 };
 
-const socketToggleVoteVis = (socket: Socket, io: SocketIO.Server, boardId: string) => {
+export const socketToggleVoteVis = (socket: Socket, io: SocketIO.Server, boardId: string) => {
     socket.on("toggle-votes", async () => {
         try {
             const existingBoard: MongoFeedbackBoard = (await Board.findOne({boardId: boardId}) as unknown) as MongoFeedbackBoard;
@@ -51,7 +51,7 @@ const socketToggleVoteVis = (socket: Socket, io: SocketIO.Server, boardId: strin
     });
 };
 
-const socketMessage = (socket: Socket, io: SocketIO.Server, boardId: string) => {
+export const socketMessage = (socket: Socket, io: SocketIO.Server, boardId: string) => {
     socket.on("message", async (newMessage: {user: string, message: string, upvotes: number }) => {
         const generatedNewMessage: Message | Error = await addIdToMessage(newMessage, boardId);
         if (generatedNewMessage instanceof Error) {

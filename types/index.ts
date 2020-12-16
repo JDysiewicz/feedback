@@ -4,7 +4,16 @@ export interface Message{
     message: string;
     upvotes: number;
     id: string;
-};
+}
+
+export interface MongoFeedbackBoard {
+    _id: string;
+    creator: string;
+    boardId: string;
+    messages: Message[];
+    hideVotes: boolean;
+    __v: number;
+}
 
 // The message list of each board created
 export interface BoardMessageList{
@@ -12,12 +21,12 @@ export interface BoardMessageList{
     boardId: string;
     messages: Message[];
     hideVotes: boolean;
-};
+}
 
 // The object used to store each message board; stored as an object where key = boardId
 export interface BoardMessageListObject {
     [key: string]: BoardMessageList
-};
+}
 
 // Used to keep track of which messages an individual has voted for client-side
 export interface PersonalVotedMessage {
@@ -68,7 +77,7 @@ export interface RouteValidatorLocationState {
     roomCreator: boolean;
     boardId: string;
     fromRedirect?: boolean;
-};
+}
 
 
 // The query sent to the backend when registering a new board

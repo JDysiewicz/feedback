@@ -1,9 +1,6 @@
 import mongoose from "mongoose";
 
-
 const { Schema } = mongoose;
-
-
 
 const boardSchema = new Schema({
     creator: String,

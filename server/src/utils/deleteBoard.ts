@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 const Board = mongoose.model("boards");
 
 export const deleteBoard = (boardId: string, io: SocketIO.Server): void => {
@@ -12,6 +13,4 @@ export const deleteBoard = (boardId: string, io: SocketIO.Server): void => {
         // Delete the message list from that room
         await Board.deleteOne({boardId: boardId});
     }, TIMEOUT);
-
-    return;
 };

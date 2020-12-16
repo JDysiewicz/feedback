@@ -1,13 +1,14 @@
 // Imports
-const socketio =  require("socket.io");
-const http = require("http");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const socketio = require("socket.io");
+import http from "http";
 import app from "../index";
 import { socketSetup } from "./socketFunctions/index";
 
 // Constants
 const SOCKET_URL = process.env.NODE_ENV === "production" ?
-     "https://feedback-dysiewicz.herokuapp.com" :
-     "http://localhost:3000";
+    "https://feedback-dysiewicz.herokuapp.com" :
+    "http://localhost:3000";
      
 const PORT = process.env.PORT || 5000;
 

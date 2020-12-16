@@ -3,20 +3,25 @@ import * as dotenv from "dotenv";
 if (process.env.NODE_ENV !== "production"){
     dotenv.config({path: `${__dirname}/.env`});
 }
+
 import express from "express";
 import mongoose from "mongoose";
 import path from "path";
 import cors from "cors";
 const app = express();
 
-// Connect to DB
-mongoose.connect(process.env.mongouri as string, {useNewUrlParser: true});
+// Connect to DB and initiate models
+try {
+    mongoose.connect(process.env.mongouri as string, {useNewUrlParser: true});
+} catch (err) {
+    console.log("--UNABLE TO CONNECT TO DB--");
+}
+
 require("./database/models/boards.ts");
 
+// Route Handlers
 import apiRouter from "./bin/routes/apiRouter";
 import errorHandler from "./errors/errorHandler";
-
-
 
 // CORS stuff
 app.use(function(req, res, next) {
@@ -28,11 +33,11 @@ app.use(function(req, res, next) {
 app.use(cors());
 app.options("*", cors());
 
-// Routing
+// Routes
 app.use("/api", apiRouter);
 app.use(errorHandler);
 
-// out 4 times for build as when built with tsc will be ready
+// Build folder is out 4 times when compiled
 app.use(express.static(path.join(__dirname, "../../../../build")));
 app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../../../../build", "index.html"));

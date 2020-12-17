@@ -12,21 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.socketRooms = void 0;
+exports.addMessageToDatabase = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
-const handleSocketError_1 = require("../../errors/handleSocketError");
-const createNewBoard_1 = require("../../utils/createNewBoard");
-const Board = mongoose_1.default.model("boards");
-exports.socketRooms = (socket, io, boardId) => __awaiter(void 0, void 0, void 0, function* () {
-    socket.join(boardId);
+exports.addMessageToDatabase = (boardId, newMessage) => __awaiter(void 0, void 0, void 0, function* () {
+    const Board = mongoose_1.default.model("boards");
     try {
         const existingBoard = yield Board.findOne({ boardId: boardId });
-        if (!existingBoard) {
-            yield createNewBoard_1.createNewBoard(socket.id, boardId);
-        }
+        const newMessageList = [...existingBoard.messages, newMessage];
+        yield Board.updateOne({ boardId: boardId }, { $set: { messages: newMessageList } });
+        return newMessageList;
     }
     catch (err) {
-        handleSocketError_1.handleSocketError(err, socket);
+        return new Error(err);
     }
 });
-//# sourceMappingURL=socketRooms.js.map
+//# sourceMappingURL=addMessageToDatabase.js.map

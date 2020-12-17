@@ -12,21 +12,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.socketRooms = void 0;
+exports.upvoteMessageInDatabase = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
-const handleSocketError_1 = require("../../errors/handleSocketError");
-const createNewBoard_1 = require("../../utils/createNewBoard");
-const Board = mongoose_1.default.model("boards");
-exports.socketRooms = (socket, io, boardId) => __awaiter(void 0, void 0, void 0, function* () {
-    socket.join(boardId);
+exports.upvoteMessageInDatabase = (message, value, boardId) => __awaiter(void 0, void 0, void 0, function* () {
+    const Board = mongoose_1.default.model("boards");
     try {
-        const existingBoard = yield Board.findOne({ boardId: boardId });
-        if (!existingBoard) {
-            yield createNewBoard_1.createNewBoard(socket.id, boardId);
-        }
+        let dbResponse;
+        if (value > 0)
+            dbResponse = yield Board.updateOne({ boardId: boardId, "messages.id": message.id }, { $inc: { "messages.$.upvotes": 1 } });
+        if (value < 0)
+            dbResponse = yield Board.updateOne({ boardId: boardId, "messages.id": message.id }, { $inc: { "messages.$.upvotes": -1 } });
+        if (dbResponse.n === 0)
+            return new Error("No message by that id or no board by that id");
+        if (dbResponse.n > 1)
+            return new Error("Multiple messages by that id");
+        return 1;
     }
     catch (err) {
-        handleSocketError_1.handleSocketError(err, socket);
+        if (err instanceof Error)
+            return err;
+        return new Error("Something went wrong.");
     }
 });
-//# sourceMappingURL=socketRooms.js.map
+//# sourceMappingURL=upvoteMessageInDatabase.js.map

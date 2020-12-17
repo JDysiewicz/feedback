@@ -1,9 +1,8 @@
 import { Message, MongoFeedbackBoard } from "../../../types";
 import mongoose from "mongoose";
-
 const Board = mongoose.model("boards");
 
-export const addIdToMessage = async (newMessage: {user: string, message: string, upvotes: number}, boardId: string): Promise<Message | Error> => {
+export const addIdToMessage = async (newMessage: {user: string, message: string, upvotes: number}, boardId: string): Promise<Message | Error> => {    
     try {
         const existingBoard: MongoFeedbackBoard = (await Board.findOne({boardId: boardId}) as unknown) as MongoFeedbackBoard;
         const currentIds = existingBoard.messages.map(message => message.id);

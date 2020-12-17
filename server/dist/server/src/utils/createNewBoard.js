@@ -12,21 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.socketRooms = void 0;
+exports.createNewBoard = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
-const handleSocketError_1 = require("../../errors/handleSocketError");
-const createNewBoard_1 = require("../../utils/createNewBoard");
 const Board = mongoose_1.default.model("boards");
-exports.socketRooms = (socket, io, boardId) => __awaiter(void 0, void 0, void 0, function* () {
-    socket.join(boardId);
-    try {
-        const existingBoard = yield Board.findOne({ boardId: boardId });
-        if (!existingBoard) {
-            yield createNewBoard_1.createNewBoard(socket.id, boardId);
-        }
-    }
-    catch (err) {
-        handleSocketError_1.handleSocketError(err, socket);
-    }
+exports.createNewBoard = (socketid, boardId) => __awaiter(void 0, void 0, void 0, function* () {
+    const newBoardMessageList = { creator: socketid, boardId: boardId, messages: [], hideVotes: true };
+    yield new Board(newBoardMessageList).save();
+    return newBoardMessageList;
 });
-//# sourceMappingURL=socketRooms.js.map
+//# sourceMappingURL=createNewBoard.js.map

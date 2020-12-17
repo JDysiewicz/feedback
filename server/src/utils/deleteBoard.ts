@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
-
 const Board = mongoose.model("boards");
-
 export const deleteBoard = (boardId: string, io: SocketIO.Server): void => {
     const TIMEOUT = 10 * 1000;
     io.to(boardId).emit("creator-disconnect",{

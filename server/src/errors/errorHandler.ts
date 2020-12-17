@@ -3,7 +3,7 @@ import ApiError from "./apiError";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const errorHandler = (err: ApiError | Error | string, req: Request, res: Response, next: () => void): void => {
-    console.error(err);
+    console.log("ERROR: ", err);
 
     if (err instanceof ApiError){
         res.status(err.code).send({success: false, err: err.error, message: err.message});

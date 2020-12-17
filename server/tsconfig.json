@@ -30,7 +30,9 @@
   },
   "exclude": [
     "node_modules",
-    "server/dist"
+    "./dist/**/*",
+    "./src/__tests__",
+    "./jest.config.js"
   ],
   "include": [
     "./src/**/*.tsx",

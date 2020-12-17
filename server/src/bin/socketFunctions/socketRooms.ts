@@ -1,7 +1,8 @@
 import { Socket } from "socket.io";
-import { Message, BoardMessageList, MongoFeedbackBoard } from "../../../../types";
 import mongoose from "mongoose";
 import { handleSocketError } from "../../errors/handleSocketError";
+import { createNewBoard } from "../../utils/createNewBoard";
+import { MongoFeedbackBoard } from "../../../../types";
 
 const Board = mongoose.model("boards");
 
@@ -12,8 +13,7 @@ export const socketRooms = async (socket: Socket, io: SocketIO.Server, boardId: 
 
         // If the room is freshly created, create an entry for it in db
         if (!existingBoard) {
-            const newBoardMessageList: BoardMessageList = {creator: socket.id, boardId: boardId, messages: [] as Message[], hideVotes: true};
-            await new Board(newBoardMessageList).save();
+            await createNewBoard(socket.id, boardId);
         }
     } catch (err) {
         handleSocketError(err, socket);

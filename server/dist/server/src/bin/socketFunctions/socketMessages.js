@@ -12,18 +12,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.socketMessages = void 0;
+exports.socketMessage = exports.socketToggleVoteVis = exports.socketUpvote = exports.sendInitialStateOfBoard = exports.socketMessages = void 0;
 const addIdToMessage_1 = require("../../utils/addIdToMessage");
+const upvoteMessageInDatabase_1 = require("../../utils/upvoteMessageInDatabase");
 const mongoose_1 = __importDefault(require("mongoose"));
 const handleSocketError_1 = require("../../errors/handleSocketError");
+const toggleVotes_1 = require("../../utils/toggleVotes");
+const addMessageToDatabase_1 = require("../../utils/addMessageToDatabase");
 const Board = mongoose_1.default.model("boards");
 exports.socketMessages = (socket, io, boardId) => {
-    sendInitialStateOfBoard(socket, boardId);
-    socketUpvote(socket, io, boardId);
-    socketToggleVoteVis(socket, io, boardId);
-    socketMessage(socket, io, boardId);
+    exports.sendInitialStateOfBoard(socket, boardId);
+    exports.socketUpvote(socket, io, boardId);
+    exports.socketToggleVoteVis(socket, io, boardId);
+    exports.socketMessage(socket, io, boardId);
 };
-const sendInitialStateOfBoard = (socket, boardId) => __awaiter(void 0, void 0, void 0, function* () {
+exports.sendInitialStateOfBoard = (socket, boardId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const existingBoard = yield Board.findOne({ boardId: boardId });
         if (!existingBoard)
@@ -35,13 +38,10 @@ const sendInitialStateOfBoard = (socket, boardId) => __awaiter(void 0, void 0, v
         handleSocketError_1.handleSocketError(err, socket);
     }
 });
-const socketUpvote = (socket, io, boardId) => {
+exports.socketUpvote = (socket, io, boardId) => {
     socket.on("upvote", ({ message, value }) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            if (value > 0)
-                yield Board.updateOne({ boardId: boardId, "messages.id": message.id }, { $inc: { "messages.$.upvotes": 1 } });
-            if (value < 0)
-                yield Board.updateOne({ boardId: boardId, "messages.id": message.id }, { $inc: { "messages.$.upvotes": -1 } });
+            yield upvoteMessageInDatabase_1.upvoteMessageInDatabase(message, value, boardId);
             const existingBoard = yield Board.findOne({ boardId: boardId });
             io.to(boardId).emit("message", existingBoard.messages);
         }
@@ -50,12 +50,12 @@ const socketUpvote = (socket, io, boardId) => {
         }
     }));
 };
-const socketToggleVoteVis = (socket, io, boardId) => {
+exports.socketToggleVoteVis = (socket, io, boardId) => {
     socket.on("toggle-votes", () => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const existingBoard = yield Board.findOne({ boardId: boardId });
-            const currVal = existingBoard.hideVotes;
-            yield Board.updateOne({ boardId: boardId }, { $set: { hideVotes: !currVal } });
+            const currVal = yield toggleVotes_1.toggleVotes(boardId);
+            if (currVal instanceof Error)
+                return handleSocketError_1.handleSocketError(currVal, socket);
             io.to(boardId).emit("toggle-votes", !currVal);
         }
         catch (err) {
@@ -63,17 +63,15 @@ const socketToggleVoteVis = (socket, io, boardId) => {
         }
     }));
 };
-const socketMessage = (socket, io, boardId) => {
+exports.socketMessage = (socket, io, boardId) => {
     socket.on("message", (newMessage) => __awaiter(void 0, void 0, void 0, function* () {
         const generatedNewMessage = yield addIdToMessage_1.addIdToMessage(newMessage, boardId);
-        if (generatedNewMessage instanceof Error) {
-            socket.emit("error", generatedNewMessage.message);
-            return;
-        }
+        if (generatedNewMessage instanceof Error)
+            return handleSocketError_1.handleSocketError(generatedNewMessage, socket);
         try {
-            const existingBoard = yield Board.findOne({ boardId: boardId });
-            const newMessageList = [...existingBoard.messages, generatedNewMessage];
-            yield Board.updateOne({ boardId: boardId }, { $set: { messages: newMessageList } });
+            const newMessageList = yield addMessageToDatabase_1.addMessageToDatabase(boardId, generatedNewMessage);
+            if (newMessageList instanceof Error)
+                return handleSocketError_1.handleSocketError(newMessageList, socket);
             io.to(boardId).emit("message", newMessageList);
         }
         catch (err) {

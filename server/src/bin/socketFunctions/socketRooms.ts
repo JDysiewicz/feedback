@@ -1,7 +1,7 @@
 import { Socket } from "socket.io";
 import mongoose from "mongoose";
 import { handleSocketError } from "../../errors/handleSocketError";
-import { createNewBoard } from "src/utils/createNewBoard";
+import { createNewBoard } from "../../utils/createNewBoard";
 import { MongoFeedbackBoard } from "../../../../types";
 
 const Board = mongoose.model("boards");
@@ -13,7 +13,7 @@ export const socketRooms = async (socket: Socket, io: SocketIO.Server, boardId: 
 
         // If the room is freshly created, create an entry for it in db
         if (!existingBoard) {
-            createNewBoard(socket.id, boardId);
+            await createNewBoard(socket.id, boardId);
         }
     } catch (err) {
         handleSocketError(err, socket);

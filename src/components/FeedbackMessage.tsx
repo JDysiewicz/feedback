@@ -14,8 +14,8 @@ React.FC<FeedbackMessageProps>
 
             <div className="FeedbackMessage-info">
                 <div style={{alignSelf: "flex-end"}}>
-                    <button className="FeedbackMessage-downvote-button" onClick={() => voteMessage(message, -1)}></button>
-                    <button className="FeedbackMessage-upvote-button"  onClick={() => voteMessage(message, 1)}></button>
+                    <button className="FeedbackMessage-downvote-button" onClick={() => voteMessage(message, -1)}>D</button>
+                    <button style={{color: "black"}} className="FeedbackMessage-upvote-button"  onClick={() => voteMessage(message, 1)}>U</button>
                 </div>
                 <p>{message.message} </p>
                 <p> <strong>Total Votes: {!hideVotes ? message.upvotes : <i style={{color: "grey"}}>hidden by room owner</i>} </strong></p>

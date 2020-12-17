@@ -4,8 +4,8 @@ import { upvoteMessageInDatabase } from "../../utils/upvoteMessageInDatabase";
 import { MongoFeedbackBoard, Message } from "../../../../types";
 import mongoose from "mongoose";
 import { handleSocketError } from "../../errors/handleSocketError";
-import { toggleVotes } from "src/utils/toggleVotes";
-import { addMessageToDatabase } from "src/utils/addMessageToDatabase";
+import { toggleVotes } from "../../utils/toggleVotes";
+import { addMessageToDatabase } from "../../utils/addMessageToDatabase";
 
 const Board = mongoose.model("boards");
 
@@ -30,7 +30,7 @@ export const sendInitialStateOfBoard = async (socket: Socket, boardId: string): 
 export const socketUpvote = (socket: Socket, io: SocketIO.Server, boardId: string): void  => {
     socket.on("upvote", async ({message, value}: {message: Message, value: number}) => {
         try {
-            upvoteMessageInDatabase(message, value, boardId);
+            await upvoteMessageInDatabase(message, value, boardId);
             const existingBoard: MongoFeedbackBoard = (await Board.findOne({boardId: boardId}) as unknown) as MongoFeedbackBoard;
             io.to(boardId).emit("message", existingBoard.messages);
         } catch (err: unknown) {
@@ -42,7 +42,7 @@ export const socketUpvote = (socket: Socket, io: SocketIO.Server, boardId: strin
 export const socketToggleVoteVis = (socket: Socket, io: SocketIO.Server, boardId: string): void => {
     socket.on("toggle-votes", async () => {
         try {
-            const currVal = toggleVotes(boardId);
+            const currVal = await toggleVotes(boardId);
             if (currVal instanceof Error) return handleSocketError(currVal, socket);
             io.to(boardId).emit("toggle-votes", !currVal);
         } catch (err: unknown) {
@@ -57,7 +57,7 @@ export const socketMessage = (socket: Socket, io: SocketIO.Server, boardId: stri
         if (generatedNewMessage instanceof Error) return handleSocketError(generatedNewMessage, socket);
 
         try {
-            const newMessageList = addMessageToDatabase(boardId, generatedNewMessage);
+            const newMessageList = await addMessageToDatabase(boardId, generatedNewMessage);
             if (newMessageList instanceof Error) return handleSocketError(newMessageList, socket);
             io.to(boardId).emit("message", newMessageList);
         } catch (err: unknown) {
